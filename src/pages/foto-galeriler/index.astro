@@ -3,6 +3,8 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import PostCard from '../../components/PostCard.astro';
+import Icon from '../../components/Icon.astro';
+import { contact } from '../../data/site';
 
 const galleries = (await getCollection('galeriler')).sort((a, b) => a.data.order - b.data.order);
 const total = galleries.reduce((n, g) => n + g.data.images.length, 0);
@@ -15,29 +17,78 @@ const total = galleries.reduce((n, g) => n + g.data.images.length, 0);
   <PageHero
     eyebrow="Multimedya"
     title="Foto Galeriler"
-    lede="Etkinliklerimizden, ziyaretlerimizden ve toplantılarımızdan kareler."
+    lede={galleries.length
+      ? 'Etkinliklerimizden, ziyaretlerimizden ve toplantılarımızdan kareler.'
+      : undefined}
     crumbs={[{ label: 'Foto Galeriler' }]}
   />
 
   <section class="section">
     <div class="shell">
-      <p class="count meta">{galleries.length} galeri · {total} fotoğraf</p>
-      <div class="grid cols-3">
-        {galleries.map((g, i) => (
-          <PostCard
-            href={`/foto-galeriler/${g.id}`}
-            title={g.data.title}
-            cover={g.data.cover}
-            badge={`${g.data.images.length} Görsel`}
-            delay={i * 60}
-            level={2}
-          />
-        ))}
-      </div>
+      {galleries.length ? (
+        <>
+          <p class="count meta">{galleries.length} galeri · {total} fotoğraf</p>
+          <div class="grid cols-3">
+            {galleries.map((g, i) => (
+              <PostCard
+                href={`/foto-galeriler/${g.id}`}
+                title={g.data.title}
+                cover={g.data.cover}
+                badge={`${g.data.images.length} Görsel`}
+                delay={i * 60}
+                level={2}
+              />
+            ))}
+          </div>
+        </>
+      ) : (
+        <div class="blank braille-field">
+          <span class="blank-icon" aria-hidden="true"><Icon name="image" /></span>
+          <h2>Henüz galeri eklenmedi</h2>
+          <p>
+            Etkinliklerimizden ve çalışmalarımızdan fotoğraflar burada
+            yayınlanacak. Şimdilik çalışmalarımızı
+            <a href="/videolar">videolarımızdan</a>,
+            <a href="/etkinlikler">etkinliklerimizden</a> ve
+            <a href="/duyurular">duyurularımızdan</a> takip edebilirsiniz.
+          </p>
+          <p class="blank-note">
+            Etkinliklerimizden fotoğrafınız varsa
+            <a href={`mailto:${contact.email}`}>{contact.email}</a>
+            adresine gönderebilirsiniz.
+          </p>
+        </div>
+      )}
     </div>
   </section>
 </Base>
 
 <style>
   .count { margin: 0 0 1.5rem; }
+
+  .blank {
+    max-width: 62ch;
+    margin-inline: auto;
+    text-align: center;
+    padding: clamp(2.5rem, 2rem + 4vw, 4.5rem) clamp(1.25rem, 1rem + 2vw, 2.5rem);
+    border: 3px dashed var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--bg-raised);
+  }
+  .blank-icon {
+    display: grid; place-items: center;
+    width: 66px; height: 66px; margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    background: var(--amber-400); color: var(--indigo-950);
+    border: 2.5px solid var(--line-strong);
+  }
+  .blank-icon :global(svg) { width: 30px; height: 30px; }
+  .blank h2 { font-size: var(--step-2); margin-bottom: 0.6em; }
+  .blank p { color: var(--text-muted); margin: 0 auto 1rem; }
+  .blank-note {
+    font-size: var(--step--1);
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--line);
+    margin-bottom: 0 !important;
+  }
 </style>

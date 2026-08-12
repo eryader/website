@@ -107,6 +107,17 @@ images:
 > `alt` metnini boş bırakmayın. Ekran okuyucu kullanan üyelerimiz için
 > görselin ne anlattığını yazın.
 
+Galeri klasörü şu an **boş**: eski sitedeki fotoğrafların bir kısmı CMS'in
+stok görselleriydi, gerçek fotoğraflar henüz eklenmedi. `/foto-galeriler` sayfası bu durumda
+"Henüz galeri eklenmedi" ekranını gösterir; ilk `.md` dosyasını
+eklediğinizde otomatik olarak normal galeri listesine döner. Anasayfadaki
+multimedya bölümü de aynı şekilde kendini ayarlar (galeri yokken videolara
+odaklanır).
+
+> **İçerik sildiğinizde `npm run rebuild` kullanın.** Astro'nun içerik
+> önbelleği (`node_modules/.astro/data-store.json`) silinen kayıtları tutar ve
+> düz `npm run build` onları üretmeye devam eder.
+
 ### Görsel eklemek
 
 Dosyaları `public/images/` altına koyun, içerikte `/images/dosya-adi.jpg`
@@ -193,6 +204,59 @@ isteyebilirsiniz:
 - Bazı galeri görselleri (özellikle *Toplantı* ve *Yönetim Kurulu*) eski
   sitedeki stok/demo fotoğraflardır. Gerçek fotoğraflarla değiştirmek
   isteyebilirsiniz.
+
+
+---
+
+## BasicDeploy ile yayınlama
+
+Site şu an BasicDeploy'da yayında: **https://z3cghxah.basicdeploy.com**
+
+Statik çıktı, bağımlılığı olmayan küçük bir Node sunucusuyla (`server.js`)
+servis edilir. Sunucu yalnızca Node yerleşik modüllerini kullanır; böylece
+256 MB'lik ücretsiz konteynerde `npm install` adımı hiç çalışmaz.
+
+### Güncelleme akışı
+
+```bash
+npm run build   # dist/ üret
+npm run pack    # .deploy/eryader-site.tar.gz paketle
+```
+
+Sonra MCP üzerinden mevcut konteynere deploy edin:
+
+```
+deploy_app(containerId: "27f8db49-92c6-4f32-9ba9-ab5b2e56e317",
+           tarballPath: "<repo>/.deploy/eryader-site.tar.gz")
+```
+
+### Bu kurulumda dikkat edilecek iki nokta
+
+- **Port 8080.** BasicDeploy'un ürettiği Dockerfile 8080'i `EXPOSE` eder ve
+  `PORT` değişkeni tanımlamaz. `server.js` bu yüzden 8080'e düşer; değiştirmeyin.
+- **macOS xattr.** Paket macOS'ta üretiliyorsa genişletilmiş nitelikler
+  temizlenmelidir, aksi hâlde deploy şu hatayla düşer:
+  `lsetxattr /workspace/dist: xattr "com.apple.provenance": operation not supported`
+  `npm run pack` bunu (`xattr -cr` + `tar --no-xattrs --no-mac-metadata`) zaten
+  hallediyor; elle `tar` çekmeyin.
+
+### Silinen dosyalar ve önbellek
+
+İki nokta güncellemelerde şaşırtabilir:
+
+- **Deploy dosyaları üzerine yazar, silmez.** Bir sayfayı veya görseli
+  kaldırdıysanız konteynerde eskisi kalmaya devam eder. Temiz sonuç için önce
+  `exec_command` ile `rm -rf /workspace/dist` çalıştırıp sonra deploy edin.
+- **Cloudflare önbelleği.** Görseller `max-age=86400` ile sunulur; silinen ya
+  da aynı adla değiştirilen bir görsel edge önbelleğinde 24 saate kadar
+  yaşayabilir. `?v=...` sorgusuyla doğrulayabilirsiniz.
+
+### Ücretsiz plan sınırları
+
+3 konteyner, konteyner başına 256 MB bellek ve 1 GB depolama, özel alan adı yok.
+`eryader.org` alan adını bağlamak için Vercel ya da GitHub Pages yolunu
+kullanın (yukarıdaki bölümler) veya BasicDeploy'da ücretli plana geçin.
+Ücretsiz planda sayfaların altında BasicDeploy'un kendi bilgi şeridi görünür.
 
 ---
 

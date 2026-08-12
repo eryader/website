@@ -9,7 +9,11 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "pack": "node scripts/pack.mjs",
+    "serve": "node server.js",
+    "clean": "rm -rf dist .astro node_modules/.astro",
+    "rebuild": "npm run clean && astro build"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

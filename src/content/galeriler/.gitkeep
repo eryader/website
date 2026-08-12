@@ -1,0 +1,12 @@
+Foto galeriler bu klasöre eklenir. Şema: src/content.config.ts → galeriler
+
+Örnek dosya (yeni-galeri.md):
+
+---
+title: "Galeri Adı"
+order: 1
+cover: "/images/kapak.jpg"
+images:
+  - src: "/images/foto-1.jpg"
+    alt: "Görseli görmeyen biri için açıklama"
+---

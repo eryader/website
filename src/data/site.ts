@@ -57,12 +57,16 @@ export const board = [
   { name: 'Sevgi Kırboyun Tipi', role: 'Yedek Üye', type: 'yedek' },
 ] as const;
 
-/** Anasayfada gösterilen sayaçlar. */
+/**
+ * Anasayfada gösterilen sayaçlar.
+ * "Fotoğraf" sayacı, foto galeri bölümü boşaltıldığı için kaldırıldı —
+ * galeriler yeniden doldurulduğunda geri eklenebilir.
+ */
 export const stats = [
   { value: 325, label: 'Faal Üye' },
   { value: 22, label: 'Etkinlik' },
-  { value: 122, label: 'Fotoğraf' },
-  { value: 250, label: "Ulaşılan Görme Engelli", suffix: '+' },
+  { value: 250, label: 'Ulaşılan Görme Engelli', suffix: '+' },
+  { value: 30, label: 'Ulaşılan Öğretmen', suffix: '+' },
 ] as const;
 
 /** Ana gezinme. `children` varsa açılır menü olarak sunulur. */

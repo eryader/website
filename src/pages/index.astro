@@ -144,23 +144,26 @@ const focus = [
   <!-- ===================== MULTİMEDYA ===================== -->
   <section class="section">
     <div class="shell">
+      {/* Galeri boşken bölüm videolara odaklanır; ölü bir "Tüm Galeriler" bağlantısı bırakmayız. */}
       <SectionHead
         eyebrow="Multimedya"
-        title="Çalışmalarımızdan kareler"
-        href="/foto-galeriler"
-        linkLabel="Tüm Galeriler"
+        title={galleries.length ? 'Çalışmalarımızdan kareler' : 'Çalışmalarımızdan videolar'}
+        href={galleries.length ? '/foto-galeriler' : '/videolar'}
+        linkLabel={galleries.length ? 'Tüm Galeriler' : 'Tüm Videolar'}
       />
-      <div class="grid cols-3">
-        {galleries.map((g, i) => (
-          <PostCard
-            href={`/foto-galeriler/${g.id}`}
-            title={g.data.title}
-            cover={g.data.cover}
-            badge={`${g.data.images.length} Görsel`}
-            delay={i * 70}
-          />
-        ))}
-      </div>
+      {galleries.length > 0 && (
+        <div class="grid cols-3">
+          {galleries.map((g, i) => (
+            <PostCard
+              href={`/foto-galeriler/${g.id}`}
+              title={g.data.title}
+              cover={g.data.cover}
+              badge={`${g.data.images.length} Görsel`}
+              delay={i * 70}
+            />
+          ))}
+        </div>
+      )}
 
       <div class="video-row">
         {videos.map((v) => (
