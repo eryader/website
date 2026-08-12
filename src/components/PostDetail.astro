@@ -1,0 +1,103 @@
+---
+import { render } from 'astro:content';
+import PageHero from './PageHero.astro';
+import PostCard from './PostCard.astro';
+import Icon from './Icon.astro';
+import { categories, type CategoryKey } from '../data/site';
+import { formatDate, excerpt } from '../utils/format';
+
+interface Props {
+  entry: any;
+  related: any[];
+}
+const { entry, related } = Astro.props;
+const cat = categories[entry.data.category as CategoryKey];
+const { Content } = await render(entry);
+const cover = entry.data.cover && !entry.data.cover.endsWith('blank.jpg') ? entry.data.cover : null;
+---
+
+<PageHero
+  eyebrow={cat.label}
+  title={entry.data.title}
+  crumbs={[{ label: cat.plural, href: cat.base }, { label: entry.data.title }]}
+  narrow
+/>
+
+<article class="section">
+  <div class="shell article-grid">
+    <div class="article-main">
+      <p class="article-meta">
+        <span class="meta">
+          <Icon name="calendar" />
+          <time datetime={entry.data.date.toISOString().slice(0, 10)}>{formatDate(entry.data.date)}</time>
+        </span>
+        <span class="tag">{cat.label}</span>
+      </p>
+
+      {cover && (
+        <img class="article-cover" src={cover} alt="" width="900" height="560" decoding="async" />
+      )}
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      {entry.data.sourceUrl && (
+        <p class="source">
+          <a class="btn btn-sm" href={entry.data.sourceUrl} target="_blank" rel="noopener noreferrer">
+            <Icon name="external" /> Kaynağa git
+          </a>
+        </p>
+      )}
+
+      <p class="back no-print">
+        <a class="btn btn-sm btn-ghost" href={cat.base}>← {cat.plural} listesine dön</a>
+      </p>
+    </div>
+  </div>
+</article>
+
+{related.length > 0 && (
+  <section class="section band">
+    <div class="shell">
+      <h2 class="rel-title">Bunlar da ilginizi çekebilir</h2>
+      <div class="grid cols-3">
+        {related.map((p, i) => (
+          <PostCard
+            href={`${categories[p.data.category as CategoryKey].base}/${p.id}`}
+            title={p.data.title}
+            cover={p.data.cover}
+            date={p.data.date}
+            summary={excerpt(p.data.summary)}
+            category={p.data.category}
+            delay={i * 70}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .article-grid { display: grid; }
+  .article-main { max-width: 74ch; margin-inline: auto; width: 100%; }
+  .article-meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.9rem;
+    margin: 0 0 1.75rem; padding-bottom: 1.25rem;
+    border-bottom: 3px solid var(--line-strong);
+  }
+  .article-meta .meta { display: inline-flex; align-items: center; gap: 0.45rem; }
+  .article-meta :global(svg) { width: 16px; height: 16px; color: var(--highlight-text); }
+  .article-cover {
+    width: 100%; border-radius: var(--radius);
+    border: 2.5px solid var(--line-strong);
+    box-shadow: var(--raise);
+    margin-bottom: 2rem;
+    background: var(--bg-sunken);
+  }
+  .source { margin-top: 2rem; }
+  .source :global(svg) { width: 16px; height: 16px; }
+  .back { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 2px solid var(--line); }
+  .band { background: var(--bg-sunken); border-top: 3px solid var(--line-strong); }
+  .rel-title { font-size: var(--step-2); margin-bottom: 1.75rem; }
+</style>

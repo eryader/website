@@ -1,0 +1,204 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+
+export async function getStaticPaths() {
+  const galleries = await getCollection('galeriler');
+  return galleries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry, others: galleries.filter((g) => g.id !== entry.id).slice(0, 3) },
+  }));
+}
+
+const { entry, others } = Astro.props;
+const images = entry.data.images;
+---
+
+<Base
+  title={entry.data.title}
+  description={`${entry.data.title} — ${images.length} fotoğraflık galeri.`}
+  image={entry.data.cover}
+>
+  <PageHero
+    eyebrow="Foto Galeri"
+    title={entry.data.title}
+    lede={`${images.length} fotoğraf`}
+    crumbs={[{ label: 'Foto Galeriler', href: '/foto-galeriler' }, { label: entry.data.title }]}
+  />
+
+  <section class="section">
+    <div class="shell">
+      <ul class="gallery">
+        {images.map((img, i) => (
+          <li class="reveal" style={`--d:${i * 60}ms`}>
+            <button type="button" class="shot" data-index={i} aria-label={`Büyüt: ${img.alt}`}>
+              <img src={img.src} alt={img.alt} loading={i < 3 ? 'eager' : 'lazy'} decoding="async" width="600" height="400" />
+              <span class="zoom" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {others.length > 0 && (
+        <nav class="others no-print" aria-label="Diğer galeriler">
+          <h2>Diğer Galeriler</h2>
+          <ul>
+            {others.map((g) => (
+              <li><a href={`/foto-galeriler/${g.id}`}>{g.data.title} <span class="meta">({g.data.images.length})</span></a></li>
+            ))}
+          </ul>
+        </nav>
+      )}
+    </div>
+  </section>
+
+  <!-- Işık kutusu -->
+  <dialog id="lightbox" aria-label="Fotoğraf görüntüleyici">
+    <button type="button" class="lb-close" aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <button type="button" class="lb-nav lb-prev" aria-label="Önceki fotoğraf">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <figure>
+      <img id="lb-img" src="" alt="" />
+      <figcaption id="lb-cap"></figcaption>
+    </figure>
+    <button type="button" class="lb-nav lb-next" aria-label="Sonraki fotoğraf">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </dialog>
+
+  <script type="application/json" id="gallery-data" set:html={JSON.stringify(images)} />
+</Base>
+
+<style>
+  .gallery {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: var(--gap);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  }
+  .shot {
+    display: block; width: 100%; padding: 0;
+    background: var(--bg-sunken); cursor: zoom-in;
+    border: 2.5px solid var(--line-strong); border-radius: var(--radius);
+    box-shadow: var(--raise); overflow: hidden; position: relative;
+    aspect-ratio: 4 / 3;
+    transition: transform var(--tr), box-shadow var(--tr);
+  }
+  .shot:hover { transform: translate(-3px, -3px); box-shadow: var(--raise-lg); }
+  .shot img { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms cubic-bezier(0.32,0.72,0.35,1); }
+  .shot:hover img { transform: scale(1.06); }
+  .zoom {
+    position: absolute; right: 0.6rem; bottom: 0.6rem;
+    display: grid; place-items: center;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--amber-400); color: var(--indigo-950);
+    border: 2.5px solid var(--indigo-950);
+    opacity: 0; transform: translateY(6px);
+    transition: opacity var(--tr), transform var(--tr);
+  }
+  .shot:hover .zoom, .shot:focus-visible .zoom { opacity: 1; transform: none; }
+  .zoom svg { width: 18px; height: 18px; }
+
+  .others { margin-top: 3.5rem; padding-top: 2rem; border-top: 3px solid var(--line-strong); }
+  .others h2 {
+    font-family: var(--font-body); font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--highlight-text); margin: 0 0 1rem;
+  }
+  .others ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .others a {
+    display: inline-block; padding: 0.55rem 1rem;
+    border: 2px solid var(--line-strong); border-radius: 100px;
+    font-size: 0.9rem; font-weight: 700; text-decoration: none; color: var(--text);
+    transition: background var(--tr);
+  }
+  .others a:hover { background: var(--amber-100); }
+  :global(:root[data-theme='dark']) .others a:hover { background: rgba(240,166,60,0.16); }
+
+  /* --- Işık kutusu --- */
+  #lightbox {
+    border: 0; padding: 0; max-width: 100vw; max-height: 100vh;
+    width: 100%; height: 100%;
+    background: rgba(10, 6, 38, 0.96);
+    color: #fff;
+    align-items: center; justify-content: center;
+    gap: 0.5rem;
+  }
+  #lightbox[open] { display: flex; }
+  #lightbox::backdrop { background: rgba(10, 6, 38, 0.9); }
+  #lightbox figure { margin: 0; max-width: min(92vw, 1100px); text-align: center; }
+  #lightbox img {
+    max-width: 100%; max-height: 78vh; width: auto; margin-inline: auto;
+    border-radius: var(--radius); border: 3px solid var(--amber-400); background: #000;
+  }
+  #lightbox figcaption { margin-top: 1rem; font-size: 0.95rem; color: #d6cff5; }
+  .lb-close {
+    position: absolute; top: 1rem; right: 1rem;
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--amber-400); color: var(--indigo-950);
+    border: 2.5px solid var(--indigo-950); cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .lb-close svg { width: 22px; height: 22px; }
+  .lb-nav {
+    width: 52px; height: 52px; flex: 0 0 auto; border-radius: 50%;
+    background: rgba(255,255,255,0.12); color: #fff;
+    border: 2px solid rgba(255,255,255,0.45); cursor: pointer;
+    display: grid; place-items: center;
+    transition: background var(--tr);
+  }
+  .lb-nav:hover { background: var(--amber-400); color: var(--indigo-950); border-color: var(--indigo-950); }
+  .lb-nav svg { width: 24px; height: 24px; }
+  @media (max-width: 640px) {
+    .lb-nav { position: absolute; bottom: 1.25rem; }
+    .lb-prev { left: 1.25rem; }
+    .lb-next { right: 1.25rem; }
+    #lightbox figcaption { margin-bottom: 4.5rem; }
+  }
+</style>
+
+<script>
+  const raw = document.getElementById('gallery-data')?.textContent ?? '[]';
+  const images: { src: string; alt: string }[] = JSON.parse(raw);
+  const dialog = document.getElementById('lightbox') as HTMLDialogElement | null;
+  const img = document.getElementById('lb-img') as HTMLImageElement | null;
+  const cap = document.getElementById('lb-cap');
+  let index = 0;
+
+  const show = (i: number) => {
+    index = (i + images.length) % images.length;
+    if (img) { img.src = images[index].src; img.alt = images[index].alt; }
+    if (cap) cap.textContent = `${images[index].alt} — ${index + 1} / ${images.length}`;
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('.shot').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      show(Number(btn.dataset.index));
+      dialog?.showModal();
+    });
+  });
+
+  document.querySelector('.lb-close')?.addEventListener('click', () => dialog?.close());
+  document.querySelector('.lb-prev')?.addEventListener('click', () => show(index - 1));
+  document.querySelector('.lb-next')?.addEventListener('click', () => show(index + 1));
+
+  dialog?.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); show(index + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); show(index - 1); }
+  });
+
+  // Arka plana tıklayınca kapat
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+
+  // Kapanışta odağı açan düğmeye geri ver
+  dialog?.addEventListener('close', () => {
+    document.querySelector<HTMLButtonElement>(`.shot[data-index="${index}"]`)?.focus();
+  });
+</script>

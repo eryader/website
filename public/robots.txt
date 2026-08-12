@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://eryader.org/sitemap-index.xml

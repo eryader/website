@@ -1,0 +1,15 @@
+.agentpack/
+.codex
+.claude
+.cursor
+.mcp.json
+AGENTS.md
+CLAUDE.md
+
+# Astro
+node_modules/
+dist/
+.astro/
+.vercel/
+.DS_Store
+npm-debug.log*

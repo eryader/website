@@ -1,0 +1,64 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import { formatDate } from '../../utils/format';
+
+const webinars = (await getCollection('webinarlar')).sort((a, b) => +a.data.date - +b.data.date);
+---
+
+<Base
+  title="Webinarlar"
+  description="Görme engelli bireylerin eğitiminde yardımcı teknolojiler üzerine çevrimiçi seminer kayıtlarımız."
+>
+  <PageHero
+    eyebrow="Etkinlikler"
+    title="Webinarlar"
+    lede="Yardımcı teknolojiler ve kapsayıcı eğitim üzerine düzenlediğimiz çevrimiçi seminerlerin kayıtları."
+    crumbs={[{ label: 'Etkinlikler', href: '/etkinlikler' }, { label: 'Webinarlar' }]}
+  />
+
+  <section class="section">
+    <div class="shell">
+      <ul class="web-list">
+        {webinars.map((w, i) => (
+          <li class="reveal" style={`--d:${i * 80}ms`}>
+            <article class="web">
+              <div class="embed">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${w.data.youtubeId}?rel=0`}
+                  title={w.data.title}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen
+                ></iframe>
+              </div>
+              <div class="web-body">
+                <span class="tag">Webinar</span>
+                <h2>{w.data.title}</h2>
+                <p>{w.data.summary}</p>
+                <p class="meta">
+                  <Icon name="calendar" />
+                  <time datetime={w.data.date.toISOString().slice(0, 10)}>{formatDate(w.data.date)}</time>
+                </p>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .web-list { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(2rem, 1rem + 3vw, 3.5rem); }
+  .web { display: grid; gap: clamp(1.25rem, 0.8rem + 2vw, 2.25rem); align-items: center; }
+  @media (min-width: 860px) { .web { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); } }
+  .web-body { display: flex; flex-direction: column; align-items: flex-start; gap: 0.7rem; }
+  .web-body h2 { font-size: var(--step-2); margin: 0; }
+  .web-body p { margin: 0; color: var(--text-muted); }
+  .web-body .meta { display: inline-flex; align-items: center; gap: 0.45rem; }
+  .web-body :global(svg) { width: 16px; height: 16px; color: var(--highlight-text); }
+</style>

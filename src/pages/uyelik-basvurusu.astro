@@ -1,0 +1,241 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { contact } from '../data/site';
+---
+
+<Base
+  title="Üyelik Başvurusu"
+  description="Kapsayıcı ve Erişilebilir Yaşam Derneği üyelik başvuru şartları ve başvuru formu."
+>
+  <PageHero
+    eyebrow="Katılım"
+    title="Üyelik Başvurusu"
+    lede="Derneğimizin amaç ve ilkelerini benimseyen herkes üyelik başvurusunda bulunabilir."
+    crumbs={[{ label: 'Üyelik Başvurusu' }]}
+  />
+
+  <section class="section">
+    <div class="shell join-grid">
+      <div class="join-copy">
+        <h2>Kimler başvurabilir?</h2>
+        <p class="lede">
+          Dernek Tüzüğü’nün <strong>4. maddesi</strong> uyarınca, fiil ehliyetine
+          sahip bulunan ve derneğin amaç ve ilkelerini benimseyerek bu doğrultuda
+          çalışmayı kabul eden, mevzuatın öngördüğü koşulları taşıyan her gerçek
+          ve tüzel kişi derneğe üye olma hakkına sahiptir.
+        </p>
+
+        <ul class="checks">
+          <li><Icon name="check" /> Fiil ehliyetine sahip olmak</li>
+          <li><Icon name="check" /> Derneğin amaç ve ilkelerini benimsemek ve bu doğrultuda çalışmayı kabul etmek</li>
+          <li><Icon name="check" /> Mevzuatın öngördüğü koşulları taşımak</li>
+          <li><Icon name="check" /> Yabancı gerçek kişiler için: Türkiye’de yerleşme hakkına sahip olmak <span class="side-note">(onursal üyelikte aranmaz)</span></li>
+        </ul>
+
+        <div class="process">
+          <h3>Başvuru süreci</h3>
+          <ol>
+            <li>Başvurunuzu dernek başkanlığına <strong>yazılı olarak</strong> iletirsiniz.</li>
+            <li>Yönetim kurulu, başvurunuzu <strong>en çok otuz gün içinde</strong> kabul veya ret şeklinde karara bağlar.</li>
+            <li>Sonuç size <strong>yazıyla</strong> bildirilir.</li>
+            <li>Başvurusu kabul edilen üye, üye kayıt defterine kaydedilir.</li>
+          </ol>
+        </div>
+
+        <p class="ref">
+          Üyelikle ilgili tüm hükümler için
+          <a href="/kurumsal/dernek-tuzugu">Dernek Tüzüğü</a> sayfasını inceleyebilirsiniz.
+        </p>
+      </div>
+
+      <!-- Form -->
+      <div class="form-wrap">
+        <h2>Başvuru Formu</h2>
+        <p class="form-lede">
+          Formu doldurduğunuzda bilgileriniz e-posta uygulamanızda hazır bir
+          mesaj olarak açılır; göndermek için onaylamanız yeterlidir.
+        </p>
+
+        <form id="join-form" novalidate>
+          <div class="field">
+            <label for="ad">Adınız Soyadınız <span aria-hidden="true">*</span></label>
+            <input type="text" id="ad" name="ad" required autocomplete="name" />
+            <p class="err" data-for="ad" hidden>Lütfen adınızı ve soyadınızı yazın.</p>
+          </div>
+
+          <div class="field">
+            <label for="eposta">E-Posta Adresiniz <span aria-hidden="true">*</span></label>
+            <input type="email" id="eposta" name="eposta" required autocomplete="email" />
+            <p class="err" data-for="eposta" hidden>Geçerli bir e-posta adresi yazın.</p>
+          </div>
+
+          <div class="field">
+            <label for="telefon">Telefon Numaranız <span aria-hidden="true">*</span></label>
+            <input type="tel" id="telefon" name="telefon" required autocomplete="tel" />
+            <p class="err" data-for="telefon" hidden>Lütfen telefon numaranızı yazın.</p>
+          </div>
+
+          <div class="field">
+            <label for="sehir">Yaşadığınız İl</label>
+            <input type="text" id="sehir" name="sehir" autocomplete="address-level1" />
+          </div>
+
+          <div class="field">
+            <label for="tur">Başvuru Türü</label>
+            <select id="tur" name="tur">
+              <option value="Asıl üyelik">Asıl üyelik</option>
+              <option value="Gönüllülük">Gönüllülük</option>
+              <option value="Kurumsal iş birliği">Kurumsal iş birliği</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="mesaj">Kendinizden ve katkı sunmak istediğiniz alanlardan bahsedin</label>
+            <textarea id="mesaj" name="mesaj" rows="5"></textarea>
+          </div>
+
+          <div class="field consent">
+            <input type="checkbox" id="kvkk" name="kvkk" required />
+            <label for="kvkk">
+              <a href="/kurumsal/genel-aydinlatma-metni">KVKK Aydınlatma Metni</a>’ni
+              okudum, kişisel verilerimin başvuru sürecinde işlenmesini kabul ediyorum.
+              <span aria-hidden="true">*</span>
+            </label>
+          </div>
+          <p class="err" data-for="kvkk" hidden>Devam etmek için onay vermeniz gerekiyor.</p>
+
+          <button class="btn btn-primary" type="submit">
+            <Icon name="mail" /> Başvuruyu Gönder
+          </button>
+
+          <p class="form-note">
+            Dilerseniz doğrudan <a href={`mailto:${contact.email}`}>{contact.email}</a>
+            adresine de yazabilirsiniz.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .join-grid { display: grid; gap: clamp(2rem, 1rem + 4vw, 4rem); align-items: start; }
+  @media (min-width: 940px) { .join-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); } }
+
+  .join-copy h2 { font-size: var(--step-3); }
+  .join-copy .lede { color: var(--text-muted); font-size: var(--step-0); line-height: 1.7; margin-bottom: 1.75rem; }
+
+  .checks { list-style: none; margin: 0 0 2.5rem; padding: 0; display: grid; gap: 0.85rem; }
+  .checks li {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    font-size: var(--step--1); line-height: 1.6;
+    padding-bottom: 0.85rem; border-bottom: 1.5px solid var(--line);
+  }
+  .checks li:last-child { border-bottom: 0; }
+  .checks :global(svg) {
+    width: 22px; height: 22px; flex: 0 0 auto; padding: 3px;
+    background: var(--amber-400); color: var(--indigo-950); border-radius: 50%;
+  }
+  .side-note { color: var(--text-muted); }
+
+  .process { padding: 1.5rem; background: var(--bg-sunken); border-radius: var(--radius); border: 2.5px solid var(--line-strong); }
+  .process h3 { font-size: var(--step-1); margin-bottom: 0.9rem; }
+  .process ol { margin: 0; padding-left: 1.3em; display: grid; gap: 0.6rem; font-size: var(--step--1); line-height: 1.6; }
+  .process li::marker { color: var(--highlight-text); font-weight: 700; }
+
+  .ref { margin-top: 1.75rem; font-size: var(--step--1); color: var(--text-muted); }
+
+  .form-wrap {
+    background: var(--bg-raised);
+    border: 2.5px solid var(--line-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--raise-lg);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+  }
+  .form-wrap h2 { font-size: var(--step-2); margin-bottom: 0.5rem; }
+  .form-lede { color: var(--text-muted); font-size: var(--step--1); margin-bottom: 1.75rem; line-height: 1.6; }
+
+  .field { margin-bottom: 1.25rem; }
+  label { display: block; font-weight: 700; font-size: 0.92rem; margin-bottom: 0.45rem; }
+  label span { color: var(--highlight-text); }
+  input[type='text'], input[type='email'], input[type='tel'], textarea, select {
+    width: 100%; font: inherit; font-size: var(--step--1);
+    padding: 0.75rem 0.9rem;
+    color: var(--text); background: var(--bg);
+    border: 2.5px solid var(--line-strong); border-radius: var(--radius-sm);
+    transition: box-shadow var(--tr);
+  }
+  input:focus, textarea:focus, select:focus { box-shadow: 3px 3px 0 0 var(--shadow-color); }
+  textarea { resize: vertical; }
+  [aria-invalid='true'] { border-color: #b3261e; }
+
+  .consent { display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 0.5rem; }
+  .consent input { width: 22px; height: 22px; flex: 0 0 auto; margin-top: 0.15rem; accent-color: var(--indigo-700); }
+  .consent label { font-weight: 400; font-size: 0.88rem; line-height: 1.55; margin: 0; }
+
+  .err { margin: 0.4rem 0 1rem; font-size: 0.85rem; font-weight: 700; color: #b3261e; }
+  :global(:root[data-theme='dark']) .err { color: #ff9f97; }
+  .form-note { margin: 1.35rem 0 0; padding-top: 1.25rem; border-top: 2px solid var(--line); font-size: 0.86rem; color: var(--text-muted); }
+  .form-wrap button :global(svg) { width: 17px; height: 17px; }
+</style>
+
+<script>
+  const form = document.getElementById('join-form') as HTMLFormElement | null;
+  const TO = 'info@eryader.org';
+
+  const setErr = (id: string, show: boolean) => {
+    const el = document.getElementById(id) as HTMLInputElement | null;
+    el?.setAttribute('aria-invalid', String(show));
+    const msg = form?.querySelector<HTMLElement>(`.err[data-for="${id}"]`);
+    if (msg) msg.hidden = !show;
+  };
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const get = (n: string) => form.elements.namedItem(n) as HTMLInputElement;
+    const ad = get('ad'), eposta = get('eposta'), telefon = get('telefon');
+    const sehir = get('sehir'), tur = get('tur');
+    const mesaj = form.elements.namedItem('mesaj') as HTMLTextAreaElement;
+    const kvkk = get('kvkk');
+
+    const checks: [string, boolean][] = [
+      ['ad', ad.value.trim().length > 1],
+      ['eposta', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(eposta.value.trim())],
+      ['telefon', telefon.value.trim().length > 5],
+      ['kvkk', kvkk.checked],
+    ];
+
+    let firstBad: string | null = null;
+    for (const [id, ok] of checks) {
+      setErr(id, !ok);
+      if (!ok && !firstBad) firstBad = id;
+    }
+    if (firstBad) { document.getElementById(firstBad)?.focus(); return; }
+
+    const body = [
+      `Başvuru Türü: ${tur.value}`,
+      `Ad Soyad: ${ad.value.trim()}`,
+      `E-posta: ${eposta.value.trim()}`,
+      `Telefon: ${telefon.value.trim()}`,
+      sehir.value.trim() ? `İl: ${sehir.value.trim()}` : null,
+      '',
+      mesaj.value.trim() || '(Ek not girilmedi)',
+      '',
+      'KVKK Aydınlatma Metni okundu ve onaylandı.',
+    ].filter((l) => l !== null).join('\n');
+
+    window.location.href =
+      `mailto:${TO}?subject=${encodeURIComponent(`Üyelik Başvurusu — ${ad.value.trim()}`)}&body=${encodeURIComponent(body)}`;
+  });
+
+  form?.querySelectorAll<HTMLInputElement>('input, textarea').forEach((el) => {
+    el.addEventListener('input', () => {
+      if (el.getAttribute('aria-invalid') === 'true') setErr(el.id, false);
+    });
+    el.addEventListener('change', () => {
+      if (el.type === 'checkbox' && el.checked) setErr(el.id, false);
+    });
+  });
+</script>

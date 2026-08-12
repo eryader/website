@@ -1,0 +1,56 @@
+---
+import { getCollection } from 'astro:content';
+import PostCard from './PostCard.astro';
+import PageHero from './PageHero.astro';
+import { categories, type CategoryKey } from '../data/site';
+import { excerpt } from '../utils/format';
+
+interface Props {
+  category: CategoryKey;
+  lede: string;
+  emptyText?: string;
+}
+const { category, lede, emptyText = 'Bu bölümde henüz içerik bulunmuyor.' } = Astro.props;
+const cat = categories[category];
+
+const posts = (await getCollection('posts', (p) => p.data.category === category)).sort(
+  (a, b) => +b.data.date - +a.data.date,
+);
+---
+
+<PageHero
+  eyebrow={cat.plural}
+  title={cat.plural}
+  lede={lede}
+  crumbs={[{ label: cat.plural }]}
+/>
+
+<section class="section">
+  <div class="shell">
+    {posts.length ? (
+      <>
+        <p class="count meta">{posts.length} içerik</p>
+        <div class="grid cols-3">
+          {posts.map((p, i) => (
+            <PostCard
+              href={`${cat.base}/${p.id}`}
+              title={p.data.title}
+              cover={p.data.cover}
+              date={p.data.date}
+              summary={excerpt(p.data.summary)}
+              category={p.data.category}
+              delay={i * 60}
+              level={2}
+            />
+          ))}
+        </div>
+      </>
+    ) : (
+      <p class="empty">{emptyText}</p>
+    )}
+  </div>
+</section>
+
+<style>
+  .count { margin: 0 0 1.5rem; }
+</style>

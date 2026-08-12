@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import PostCard from '../../components/PostCard.astro';
+
+const galleries = (await getCollection('galeriler')).sort((a, b) => a.data.order - b.data.order);
+const total = galleries.reduce((n, g) => n + g.data.images.length, 0);
+---
+
+<Base
+  title="Foto Galeriler"
+  description="Kapsayıcı ve Erişilebilir Yaşam Derneği etkinlik ve çalışmalarından fotoğraf galerileri."
+>
+  <PageHero
+    eyebrow="Multimedya"
+    title="Foto Galeriler"
+    lede="Etkinliklerimizden, ziyaretlerimizden ve toplantılarımızdan kareler."
+    crumbs={[{ label: 'Foto Galeriler' }]}
+  />
+
+  <section class="section">
+    <div class="shell">
+      <p class="count meta">{galleries.length} galeri · {total} fotoğraf</p>
+      <div class="grid cols-3">
+        {galleries.map((g, i) => (
+          <PostCard
+            href={`/foto-galeriler/${g.id}`}
+            title={g.data.title}
+            cover={g.data.cover}
+            badge={`${g.data.images.length} Görsel`}
+            delay={i * 60}
+            level={2}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .count { margin: 0 0 1.5rem; }
+</style>

@@ -1,0 +1,77 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { contact } from '../data/site';
+---
+
+<Base
+  title="Erişilebilirlik"
+  description="Eryader web sitesinin erişilebilirlik özellikleri, klavye kısayolları ve geri bildirim kanalları."
+>
+  <PageHero
+    eyebrow="Erişilebilirlik"
+    title="Erişilebilirlik Beyanı"
+    lede="Erişilebilirlik bizim için bir ek özellik değil, varlık nedenimiz. Bu siteyi de o ilkeyle kurduk."
+    crumbs={[{ label: 'Erişilebilirlik' }]}
+  />
+
+  <section class="section">
+    <div class="shell-narrow prose">
+      <p>
+        Kapsayıcı ve Erişilebilir Yaşam Derneği olarak, sunduğumuz tüm ürün ve
+        hizmetlerin <strong>evrensel tasarım</strong> ilkesi uyarınca herkes
+        tarafından erişilebilir olmasını temel önceliklerimizden biri sayıyoruz.
+        Bu web sitesi de bu ilkeye göre tasarlandı ve geliştirildi.
+      </p>
+
+      <h2>Sitedeki erişilebilirlik özellikleri</h2>
+      <ul>
+        <li><strong>Yazı tipi seçimi.</strong> Gövde metinlerinde, Braille Institute tarafından az gören okurlar için tasarlanan <em>Atkinson Hyperlegible</em> yazı tipi kullanılır. Bu yazı tipi, birbirine benzeyen harfleri (I / l / 1, O / 0) ayırt edilebilir kılar.</li>
+        <li><strong>Görünüm ayarları.</strong> Sayfanın en üstündeki araç çubuğundan yazı boyutunu büyütebilir, yüksek kontrast moduna geçebilir, koyu temayı açabilir ve hareketleri kapatabilirsiniz. Tercihleriniz tarayıcınızda saklanır.</li>
+        <li><strong>Klavye ile tam kullanım.</strong> Sitedeki tüm bağlantı, düğme ve form alanlarına yalnızca klavyeyle erişilebilir. Odaklanılan öğe her zaman belirgin turuncu bir çerçeveyle gösterilir.</li>
+        <li><strong>İçeriğe geç bağlantısı.</strong> Sayfada <kbd>Sekme</kbd> tuşuna ilk bastığınızda beliren “İçeriğe geç” bağlantısıyla menüyü atlayıp doğrudan ana içeriğe ulaşabilirsiniz.</li>
+        <li><strong>Ekran okuyucu uyumu.</strong> Sayfalar anlamsal HTML işaretlemesiyle kurulur; başlık düzeni sıralıdır, gezinme alanları etiketlenmiştir, görsellere alternatif metin verilmiştir.</li>
+        <li><strong>Renk kontrastı.</strong> Metin ve arka plan renkleri WCAG 2.1 AA eşiğini karşılayacak biçimde seçilmiştir; yüksek kontrast modu daha da güçlü bir kontrast sunar.</li>
+        <li><strong>Hareket duyarlılığı.</strong> İşletim sisteminizde “hareketi azalt” ayarı açıksa animasyonlar otomatik olarak devre dışı kalır.</li>
+        <li><strong>Yakınlaştırma.</strong> Sayfa düzeni %200 yakınlaştırmada da yatay kaydırma gerektirmeden okunabilir kalır.</li>
+      </ul>
+
+      <h2>Klavye kısayolları</h2>
+      <ul>
+        <li><kbd>Sekme</kbd> / <kbd>Shift</kbd> + <kbd>Sekme</kbd> — sonraki / önceki öğeye geç</li>
+        <li><kbd>Enter</kbd> veya <kbd>Boşluk</kbd> — bağlantıyı veya düğmeyi etkinleştir</li>
+        <li><kbd>Esc</kbd> — açık menüyü veya fotoğraf görüntüleyiciyi kapat</li>
+        <li><kbd>←</kbd> / <kbd>→</kbd> — fotoğraf görüntüleyicide önceki / sonraki görsel</li>
+      </ul>
+
+      <h2>Uyum düzeyi</h2>
+      <p>
+        Bu siteyi <strong>WCAG 2.1 AA</strong> ölçütlerini karşılayacak şekilde
+        geliştiriyoruz. Erişilebilirlik sürekli bir çalışma alanıdır; sitenin
+        bazı bölümlerinde (özellikle dış kaynaklı gömülü video ve harita
+        içeriklerinde) tam denetimimiz olmayan sınırlamalar bulunabilir.
+      </p>
+
+      <h2>Geri bildirim</h2>
+      <p>
+        Sitede erişilemediğiniz bir içerik ya da karşılaştığınız bir engel varsa
+        bize bildirin — bunu bir hata olarak ele alır ve düzeltiriz.
+        <a href={`mailto:${contact.email}`}>{contact.email}</a> adresine
+        yazabilir veya <a href="/iletisim">iletişim formunu</a> kullanabilirsiniz.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  kbd {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.82em;
+    background: var(--bg-sunken);
+    border: 1.5px solid var(--line-strong);
+    border-bottom-width: 3px;
+    border-radius: 5px;
+    padding: 0.12em 0.42em;
+    white-space: nowrap;
+  }
+</style>

@@ -1,0 +1,92 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+
+export async function getStaticPaths() {
+  const videos = (await getCollection('videolar')).sort((a, b) => a.data.order - b.data.order);
+  return videos.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry, others: videos.filter((v) => v.id !== entry.id) },
+  }));
+}
+
+const { entry, others } = Astro.props;
+const id = entry.data.youtubeId;
+---
+
+<Base title={entry.data.title} description={entry.data.summary} image={entry.data.cover}>
+  <PageHero
+    eyebrow="Video"
+    title={entry.data.title}
+    crumbs={[{ label: 'Videolar', href: '/videolar' }, { label: entry.data.title }]}
+  />
+
+  <section class="section">
+    <div class="shell vid-layout">
+      <div>
+        <div class="embed">
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${id}?rel=0`}
+            title={entry.data.title}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <p class="watch">
+          <a class="btn btn-sm" href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noopener noreferrer">
+            <Icon name="external" /> YouTube'da izle
+          </a>
+        </p>
+      </div>
+
+      {others.length > 0 && (
+        <aside class="side no-print" aria-label="Diğer videolar">
+          <h2>Diğer Videolar</h2>
+          <ul>
+            {others.map((v) => (
+              <li>
+                <a href={`/videolar/${v.id}`}>
+                  <img src={v.data.cover} alt="" loading="lazy" width="120" height="68" />
+                  <span>{v.data.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .vid-layout { display: grid; gap: clamp(2rem, 1rem + 3vw, 3rem); align-items: start; }
+  @media (min-width: 960px) { .vid-layout { grid-template-columns: minmax(0, 1fr) 320px; } }
+
+  .watch { margin-top: 1.5rem; }
+  .watch :global(svg) { width: 16px; height: 16px; }
+
+  .side h2 {
+    font-family: var(--font-body); font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--highlight-text); margin: 0 0 1rem;
+    padding-bottom: 0.6rem; border-bottom: 3px solid var(--line-strong);
+  }
+  .side ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+  .side a {
+    display: flex; gap: 0.85rem; align-items: center;
+    padding: 0.6rem; border-radius: var(--radius-sm);
+    text-decoration: none; color: var(--text);
+    border: 2px solid transparent;
+    transition: background var(--tr), border-color var(--tr);
+  }
+  .side a:hover { background: var(--bg-sunken); border-color: var(--line-strong); }
+  .side img {
+    width: 92px; height: 56px; flex: 0 0 auto; object-fit: cover;
+    border-radius: 6px; border: 2px solid var(--line-strong); background: var(--bg-sunken);
+  }
+  .side span { font-size: 0.86rem; font-weight: 700; line-height: 1.35; }
+</style>

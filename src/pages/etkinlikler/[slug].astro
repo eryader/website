@@ -1,0 +1,71 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import { formatDate } from '../../utils/format';
+
+export async function getStaticPaths() {
+  const events = await getCollection('etkinlikler');
+  return events.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const hasBody = entry.body.trim().length > 0;
+---
+
+<Base title={entry.data.title} description={entry.data.summary} image={entry.data.cover}>
+  <PageHero
+    eyebrow="Etkinlik"
+    title={entry.data.title}
+    crumbs={[{ label: 'Etkinlikler', href: '/etkinlikler' }, { label: entry.data.title }]}
+    narrow
+  />
+
+  <article class="section">
+    <div class="shell article">
+      <p class="article-meta">
+        <span class="meta">
+          <Icon name="calendar" />
+          <time datetime={entry.data.date.toISOString().slice(0, 10)}>{formatDate(entry.data.date)}</time>
+        </span>
+        {entry.data.location && (
+          <span class="meta"><Icon name="pin" /> {entry.data.location}</span>
+        )}
+      </p>
+
+      {entry.data.cover && (
+        <img class="cover" src={entry.data.cover} alt="" width="900" height="500" decoding="async" />
+      )}
+
+      <div class="prose">
+        {hasBody ? <Content /> : <p>Bu etkinlik için ayrıntılı program bilgisi kayıtlarımızda yer almıyor.</p>}
+      </div>
+
+      <p class="back no-print">
+        <a class="btn btn-sm btn-ghost" href="/etkinlikler">← Etkinlikler listesine dön</a>
+      </p>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .article { max-width: 74ch; margin-inline: auto; }
+  .article-meta {
+    display: flex; flex-wrap: wrap; gap: 1.25rem;
+    margin: 0 0 1.75rem; padding-bottom: 1.25rem;
+    border-bottom: 3px solid var(--line-strong);
+  }
+  .article-meta .meta { display: inline-flex; align-items: center; gap: 0.45rem; }
+  .article-meta :global(svg) { width: 16px; height: 16px; color: var(--highlight-text); }
+  .cover {
+    width: 100%; border-radius: var(--radius);
+    border: 2.5px solid var(--line-strong); box-shadow: var(--raise);
+    margin-bottom: 2rem; background: var(--bg-sunken);
+  }
+  .back { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 2px solid var(--line); }
+</style>

@@ -1,0 +1,250 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { contact, social, bank } from '../data/site';
+---
+
+<Base
+  title="İletişim"
+  description="Kapsayıcı ve Erişilebilir Yaşam Derneği iletişim bilgileri, adres ve mesaj formu."
+>
+  <PageHero
+    eyebrow="İletişim"
+    title="Bize Ulaşın"
+    lede="Sorularınız, iş birliği önerileriniz ve gönüllülük başvurularınız için bize yazın."
+    crumbs={[{ label: 'İletişim' }]}
+  />
+
+  <section class="section">
+    <div class="shell contact-grid">
+      <!-- Bilgiler -->
+      <div class="info">
+        <h2 class="group-title">İletişim Bilgileri</h2>
+        <ul class="info-list">
+          <li>
+            <span class="ico"><Icon name="pin" /></span>
+            <div>
+              <strong>Adres</strong>
+              <p>{contact.address}</p>
+              <a href={contact.mapsLink} target="_blank" rel="noopener noreferrer">
+                Haritada aç <Icon name="external" />
+              </a>
+            </div>
+          </li>
+          <li>
+            <span class="ico"><Icon name="mail" /></span>
+            <div>
+              <strong>E-posta</strong>
+              <p><a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+            </div>
+          </li>
+          <li>
+            <span class="ico"><Icon name="bank" /></span>
+            <div>
+              <strong>Bağış / Aidat Hesabı</strong>
+              <p>{bank.bankName} · {bank.accountType}</p>
+              <p><code>{bank.iban}</code></p>
+              <a href="/hesap-numaralari">Hesap numaraları</a>
+            </div>
+          </li>
+        </ul>
+
+        <h2 class="group-title">Sosyal Medya</h2>
+        <ul class="social-list">
+          {social.map((s) => (
+            <li>
+              <a href={s.url} target="_blank" rel="noopener noreferrer">
+                <Icon name={s.name.toLowerCase().replace(/[^a-z]/g, '')} />
+                {s.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Form -->
+      <div class="form-wrap">
+        <h2 class="group-title">Mesaj Gönderin</h2>
+        <form id="contact-form" novalidate>
+          <div class="field">
+            <label for="ad">Adınız Soyadınız <span aria-hidden="true">*</span></label>
+            <input type="text" id="ad" name="ad" required autocomplete="name" />
+            <p class="err" data-for="ad" hidden>Lütfen adınızı ve soyadınızı yazın.</p>
+          </div>
+
+          <div class="field">
+            <label for="eposta">E-Posta Adresiniz <span aria-hidden="true">*</span></label>
+            <input type="email" id="eposta" name="eposta" required autocomplete="email" />
+            <p class="err" data-for="eposta" hidden>Geçerli bir e-posta adresi yazın.</p>
+          </div>
+
+          <div class="field">
+            <label for="telefon">Telefon Numaranız</label>
+            <input type="tel" id="telefon" name="telefon" autocomplete="tel" />
+            <p class="hint-text">İsteğe bağlı.</p>
+          </div>
+
+          <div class="field">
+            <label for="mesaj">Mesajınız <span aria-hidden="true">*</span></label>
+            <textarea id="mesaj" name="mesaj" rows="6" required></textarea>
+            <p class="err" data-for="mesaj" hidden>Lütfen mesajınızı yazın.</p>
+          </div>
+
+          <button class="btn btn-primary" type="submit">
+            <Icon name="mail" /> Mesajı Gönder
+          </button>
+
+          <p class="form-note" role="note">
+            Form, mesajınızı e-posta uygulamanızda hazır olarak açar; göndermek için
+            kendi e-posta uygulamanızdan onaylamanız gerekir. Dilerseniz doğrudan
+            <a href={`mailto:${contact.email}`}>{contact.email}</a> adresine de yazabilirsiniz.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Harita -->
+  <section class="map-section">
+    <h2 class="sr-only">Konumumuz</h2>
+    <iframe
+      src={contact.mapsEmbed}
+      title="Dernek merkezimizin harita üzerindeki konumu"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+    ></iframe>
+  </section>
+</Base>
+
+<style>
+  .contact-grid { display: grid; gap: clamp(2rem, 1rem + 4vw, 4rem); align-items: start; }
+  @media (min-width: 940px) { .contact-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); } }
+
+  .group-title {
+    font-family: var(--font-body); font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--highlight-text); margin: 0 0 1.35rem;
+    padding-bottom: 0.6rem; border-bottom: 3px solid var(--line-strong);
+  }
+  .group-title:not(:first-child) { margin-top: 2.75rem; }
+
+  .info-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.5rem; }
+  .info-list li { display: flex; gap: 1rem; }
+  .ico {
+    display: grid; place-items: center; flex: 0 0 auto;
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--amber-100); color: var(--indigo-800);
+    border: 2.5px solid var(--line-strong);
+  }
+  :global(:root[data-theme='dark']) .ico { background: rgba(240,166,60,0.18); color: var(--amber-300); }
+  .ico :global(svg) { width: 20px; height: 20px; }
+  .info-list strong { display: block; font-size: var(--step-0); margin-bottom: 0.2rem; }
+  .info-list p { margin: 0 0 0.3rem; color: var(--text-muted); line-height: 1.55; }
+  .info-list code {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.86rem; color: var(--text);
+    background: var(--bg-sunken); border: 1.5px solid var(--line);
+    border-radius: 6px; padding: 0.25rem 0.5rem; word-break: break-all;
+  }
+  .info-list a { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700; font-size: 0.9rem; }
+  .info-list a :global(svg) { width: 14px; height: 14px; }
+
+  .social-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .social-list a {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.55rem 1rem; border: 2px solid var(--line-strong); border-radius: 100px;
+    font-size: 0.88rem; font-weight: 700; text-decoration: none; color: var(--text);
+    transition: background var(--tr);
+  }
+  .social-list a:hover { background: var(--amber-100); }
+  :global(:root[data-theme='dark']) .social-list a:hover { background: rgba(240,166,60,0.16); }
+  .social-list :global(svg) { width: 17px; height: 17px; }
+
+  /* --- Form --- */
+  .form-wrap {
+    background: var(--bg-raised);
+    border: 2.5px solid var(--line-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--raise-lg);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+  }
+  .field { margin-bottom: 1.35rem; }
+  label { display: block; font-weight: 700; font-size: 0.92rem; margin-bottom: 0.45rem; }
+  label span { color: var(--highlight-text); }
+  input, textarea {
+    width: 100%; font: inherit; font-size: var(--step--1);
+    padding: 0.75rem 0.9rem;
+    color: var(--text); background: var(--bg);
+    border: 2.5px solid var(--line-strong); border-radius: var(--radius-sm);
+    transition: box-shadow var(--tr);
+  }
+  input:focus, textarea:focus { box-shadow: 3px 3px 0 0 var(--shadow-color); }
+  textarea { resize: vertical; min-height: 8rem; }
+  input[aria-invalid='true'], textarea[aria-invalid='true'] { border-color: #b3261e; }
+  .err { margin: 0.4rem 0 0; font-size: 0.85rem; font-weight: 700; color: #b3261e; }
+  :global(:root[data-theme='dark']) .err { color: #ff9f97; }
+  .hint-text { margin: 0.4rem 0 0; font-size: 0.85rem; color: var(--text-muted); }
+  .form-note {
+    margin: 1.35rem 0 0; padding-top: 1.25rem;
+    border-top: 2px solid var(--line);
+    font-size: 0.86rem; color: var(--text-muted); line-height: 1.6;
+  }
+  .form-wrap button :global(svg) { width: 17px; height: 17px; }
+
+  /* --- Harita --- */
+  .map-section { border-top: 3px solid var(--line-strong); line-height: 0; }
+  .map-section iframe { width: 100%; height: clamp(300px, 40vh, 460px); border: 0; }
+  :global(:root[data-theme='dark']) .map-section iframe { filter: invert(0.9) hue-rotate(180deg); }
+</style>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const TO = 'info@eryader.org';
+
+  const showError = (el: HTMLInputElement | HTMLTextAreaElement, show: boolean) => {
+    el.setAttribute('aria-invalid', String(show));
+    const msg = form?.querySelector<HTMLElement>(`.err[data-for="${el.id}"]`);
+    if (msg) msg.hidden = !show;
+  };
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const ad = form.elements.namedItem('ad') as HTMLInputElement;
+    const eposta = form.elements.namedItem('eposta') as HTMLInputElement;
+    const telefon = form.elements.namedItem('telefon') as HTMLInputElement;
+    const mesaj = form.elements.namedItem('mesaj') as HTMLTextAreaElement;
+
+    const checks: [HTMLInputElement | HTMLTextAreaElement, boolean][] = [
+      [ad, ad.value.trim().length > 1],
+      [eposta, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(eposta.value.trim())],
+      [mesaj, mesaj.value.trim().length > 4],
+    ];
+
+    let firstBad: HTMLElement | null = null;
+    for (const [el, ok] of checks) {
+      showError(el, !ok);
+      if (!ok && !firstBad) firstBad = el;
+    }
+    if (firstBad) { firstBad.focus(); return; }
+
+    const body = [
+      `Ad Soyad: ${ad.value.trim()}`,
+      `E-posta: ${eposta.value.trim()}`,
+      telefon.value.trim() ? `Telefon: ${telefon.value.trim()}` : null,
+      '',
+      mesaj.value.trim(),
+    ].filter((l) => l !== null).join('\n');
+
+    const subject = `Web sitesi iletişim formu — ${ad.value.trim()}`;
+    window.location.href =
+      `mailto:${TO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+
+  // Kullanıcı düzeltmeye başlayınca hatayı temizle
+  form?.querySelectorAll<HTMLInputElement>('input, textarea').forEach((el) => {
+    el.addEventListener('input', () => {
+      if (el.getAttribute('aria-invalid') === 'true') showError(el, false);
+    });
+  });
+</script>

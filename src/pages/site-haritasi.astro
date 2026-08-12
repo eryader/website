@@ -1,0 +1,102 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { categories } from '../data/site';
+
+const posts = (await getCollection('posts')).sort((a, b) => +b.data.date - +a.data.date);
+const kurumsal = (await getCollection('kurumsal')).sort((a, b) => a.data.order - b.data.order);
+const galeriler = (await getCollection('galeriler')).sort((a, b) => a.data.order - b.data.order);
+const videolar = (await getCollection('videolar')).sort((a, b) => a.data.order - b.data.order);
+const etkinlikler = (await getCollection('etkinlikler')).sort((a, b) => +b.data.date - +a.data.date);
+const webinarlar = await getCollection('webinarlar');
+
+const byCat = (c: keyof typeof categories) => posts.filter((p) => p.data.category === c);
+
+const sections = [
+  {
+    title: 'Derneğimiz',
+    links: [
+      ...kurumsal.map((k) => ({ label: k.data.title, href: `/kurumsal/${k.id}` })),
+      { label: 'Yönetim Kurulu', href: '/kurullar/yonetim-kurulu' },
+    ],
+  },
+  {
+    title: 'Duyurular',
+    links: byCat('duyurular').map((p) => ({ label: p.data.title, href: `/duyurular/${p.id}` })),
+  },
+  {
+    title: 'Haberler',
+    links: byCat('haberler').map((p) => ({ label: p.data.title, href: `/haberler/${p.id}` })),
+  },
+  {
+    title: 'Basında Biz',
+    links: byCat('basinda-biz').map((p) => ({ label: p.data.title, href: `/basinda-biz/${p.id}` })),
+  },
+  {
+    title: 'Etkinlikler ve Webinarlar',
+    links: [
+      ...etkinlikler.map((e) => ({ label: e.data.title, href: `/etkinlikler/${e.id}` })),
+      ...webinarlar.map((w) => ({ label: w.data.title, href: '/webinarlar' })),
+    ],
+  },
+  {
+    title: 'Foto Galeriler',
+    links: galeriler.map((g) => ({ label: g.data.title, href: `/foto-galeriler/${g.id}` })),
+  },
+  {
+    title: 'Videolar',
+    links: videolar.map((v) => ({ label: v.data.title, href: `/videolar/${v.id}` })),
+  },
+  {
+    title: 'Katılım ve İletişim',
+    links: [
+      { label: 'Üyelik Başvurusu', href: '/uyelik-basvurusu' },
+      { label: 'Bağış Yap', href: '/bagis-yap' },
+      { label: 'Hesap Numaraları', href: '/hesap-numaralari' },
+      { label: 'İletişim', href: '/iletisim' },
+      { label: 'Erişilebilirlik', href: '/erisilebilirlik' },
+    ],
+  },
+];
+---
+
+<Base title="Site Haritası" description="Eryader web sitesindeki tüm sayfaların listesi.">
+  <PageHero
+    title="Site Haritası"
+    lede="Sitedeki tüm sayfalara bu listeden ulaşabilirsiniz."
+    crumbs={[{ label: 'Site Haritası' }]}
+  />
+
+  <section class="section">
+    <div class="shell">
+      <p class="intro"><a href="/">Anasayfa</a></p>
+      <div class="map-grid">
+        {sections.filter((s) => s.links.length > 0).map((s) => (
+          <nav aria-label={s.title}>
+            <h2>{s.title}</h2>
+            <ul>
+              {s.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+            </ul>
+          </nav>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .intro { margin: 0 0 2rem; font-weight: 700; }
+  .map-grid {
+    display: grid; gap: clamp(1.75rem, 1rem + 2.5vw, 3rem);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+  }
+  h2 {
+    font-family: var(--font-body); font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--highlight-text); margin: 0 0 1rem;
+    padding-bottom: 0.6rem; border-bottom: 3px solid var(--line-strong);
+  }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
+  li a { font-size: 0.94rem; line-height: 1.45; }
+</style>

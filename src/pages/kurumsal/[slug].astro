@@ -1,0 +1,93 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('kurumsal');
+  // Sıralamayı bir kez, kopya üzerinde yap: map sırasında diziyi yerinde
+  // değiştirmek üretilen yolları bozar.
+  const siblings = [...pages].sort((a, b) => a.data.order - b.data.order);
+  return pages.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry, siblings },
+  }));
+}
+
+const { entry, siblings } = Astro.props;
+const { Content } = await render(entry);
+
+/** Tüzük ve KVKK gibi uzun metinlerde okuma kolaylığı için içindekiler benzeri yan menü. */
+const isLong = entry.body.length > 12000;
+---
+
+<Base title={entry.data.title} description={entry.data.summary}>
+  <PageHero
+    eyebrow="Derneğimiz"
+    title={entry.data.title}
+    lede={entry.data.summary}
+    crumbs={[{ label: 'Derneğimiz', href: '/kurumsal/hakkimizda' }, { label: entry.data.title }]}
+  />
+
+  <div class="section">
+    <div class="shell doc-grid">
+      <aside class="doc-side no-print">
+        <nav aria-label="Derneğimiz bölümü">
+          <h2>Derneğimiz</h2>
+          <ul>
+            {siblings.map((s) => (
+              <li>
+                <a href={`/kurumsal/${s.id}`} aria-current={s.id === entry.id ? 'page' : undefined}>
+                  {s.data.title}
+                </a>
+              </li>
+            ))}
+            <li><a href="/kurullar/yonetim-kurulu">Yönetim Kurulu</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <div class:list={['prose', isLong && 'prose-doc']}>
+        <Content />
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .doc-grid { display: grid; gap: clamp(2rem, 1rem + 3vw, 3.5rem); align-items: start; }
+  @media (min-width: 900px) { .doc-grid { grid-template-columns: 250px minmax(0, 1fr); } }
+
+  .doc-side { position: sticky; top: 8.5rem; }
+  .doc-side h2 {
+    font-family: var(--font-body);
+    font-size: 0.76rem; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--highlight-text); margin: 0 0 1rem;
+  }
+  .doc-side ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; }
+  .doc-side a {
+    display: block; padding: 0.6rem 0.85rem;
+    font-size: 0.92rem; font-weight: 700;
+    color: var(--text); text-decoration: none;
+    border-left: 3px solid var(--line);
+    transition: background var(--tr), border-color var(--tr), color var(--tr);
+  }
+  .doc-side a:hover { background: var(--bg-sunken); border-left-color: var(--highlight); }
+  .doc-side a[aria-current='page'] {
+    border-left-color: var(--highlight);
+    background: var(--bg-sunken);
+    color: var(--accent-text);
+  }
+  @media (max-width: 899px) {
+    .doc-side { position: static; }
+    .doc-side ul { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .doc-side a { border-left: 0; border: 2px solid var(--line); border-radius: 100px; padding: 0.4rem 0.9rem; font-size: 0.84rem; }
+    .doc-side a[aria-current='page'] { border-color: var(--line-strong); }
+  }
+
+  /* Uzun mevzuat metinleri: madde başlıkları belirgin, satır aralığı geniş */
+  .prose-doc { font-size: var(--step--1); }
+  .prose-doc :global(p) { line-height: 1.8; }
+  .prose-doc :global(p > strong:first-child) { color: var(--accent-text); }
+</style>

@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+
+const videos = (await getCollection('videolar')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title="Videolar"
+  description="Kapsayıcı ve Erişilebilir Yaşam Derneği'nin röportaj, tanıtım ve eğitim videoları."
+>
+  <PageHero
+    eyebrow="Multimedya"
+    title="Videolar"
+    lede="Röportajlar, tanıtımlar ve yardımcı teknoloji anlatımları."
+    crumbs={[{ label: 'Videolar' }]}
+  />
+
+  <section class="section">
+    <div class="shell">
+      <ul class="vid-grid">
+        {videos.map((v, i) => (
+          <li class="reveal" style={`--d:${i * 70}ms`}>
+            <a class="vid" href={`/videolar/${v.id}`}>
+              <span class="thumb">
+                <img src={v.data.cover} alt="" loading="lazy" decoding="async" width="480" height="270" />
+                <span class="play" aria-hidden="true"><Icon name="play" /></span>
+              </span>
+              <span class="info">
+                <span class="tag">Video</span>
+                <h2>{v.data.title}</h2>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .vid-grid {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: var(--gap);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  }
+  .vid {
+    display: flex; flex-direction: column;
+    height: 100%;
+    background: var(--bg-raised);
+    border: 2.5px solid var(--line-strong); border-radius: var(--radius);
+    box-shadow: var(--raise); overflow: hidden;
+    text-decoration: none; color: var(--text);
+    transition: transform var(--tr), box-shadow var(--tr);
+  }
+  .vid:hover { transform: translate(-3px, -3px); box-shadow: var(--raise-lg); }
+  .thumb {
+    position: relative; display: block;
+    aspect-ratio: 16 / 9; background: var(--bg-sunken);
+    border-bottom: 2.5px solid var(--line-strong); overflow: hidden;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms cubic-bezier(0.32,0.72,0.35,1); }
+  .vid:hover .thumb img { transform: scale(1.05); }
+  .play {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    background: rgba(23, 16, 76, 0.4); transition: background var(--tr);
+  }
+  .vid:hover .play { background: rgba(23, 16, 76, 0.18); }
+  .play :global(svg) {
+    width: 56px; height: 56px; padding: 13px;
+    background: var(--amber-400); color: var(--indigo-950);
+    border: 3px solid var(--indigo-950); border-radius: 50%;
+  }
+  .info { display: flex; flex-direction: column; gap: 0.55rem; padding: 1.15rem 1.3rem 1.35rem; }
+  .info .tag { align-self: flex-start; }
+  .info h2 { font-size: var(--step-0); line-height: 1.35; margin: 0; }
+</style>

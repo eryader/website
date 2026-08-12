@@ -1,0 +1,200 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { bank, contact } from '../data/site';
+
+const uses = [
+  {
+    icon: 'doc',
+    title: 'Erişilebilir materyal',
+    text: 'Dokunsal, sesli ve braille öğretim materyallerinin hazırlanması ve öğrencilere ulaştırılması.',
+  },
+  {
+    icon: 'users',
+    title: 'Eğitim programları',
+    text: 'Görme engelli öğrencilere, ailelerine ve öğretmenlere yönelik çevrimiçi eğitim ve mentörlük programları.',
+  },
+  {
+    icon: 'play',
+    title: 'Yardımcı teknoloji',
+    text: 'Öğrencilerin ihtiyaç duyduğu yardımcı teknoloji araçlarının temini ve tanıtımı.',
+  },
+];
+---
+
+<Base
+  title="Bağış Yap"
+  description="Kapsayıcı ve Erişilebilir Yaşam Derneği'ne bağış yaparak görme engelli öğrencilerin erişilebilir eğitim materyallerine ulaşmasına destek olun."
+>
+  <PageHero
+    eyebrow="Destek Olun"
+    title="Bağış Yap"
+    lede="Desteğiniz, görme engelli öğrenciler için erişilebilir eğitim materyaline dönüşüyor."
+    crumbs={[{ label: 'Bağış Yap' }]}
+  />
+
+  <section class="section">
+    <div class="shell give-grid">
+      <div class="give-copy">
+        <h2>Bağışınız nereye gidiyor?</h2>
+        <p class="lede">
+          Kapsayıcı ve Erişilebilir Yaşam Derneği, görme engelli bireylerin
+          eğitimde tam ve eşit katılımı için çalışır. Bağışlarınız doğrudan
+          aşağıdaki çalışma alanlarında kullanılır.
+        </p>
+        <ul class="uses">
+          {uses.map((u) => (
+            <li>
+              <span class="ico"><Icon name={u.icon} /></span>
+              <div>
+                <strong>{u.title}</strong>
+                <p>{u.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <aside class="give-card">
+        <h2>Banka Hesabımız</h2>
+        <p class="give-note">
+          Bağışınızı aşağıdaki hesaba havale veya EFT ile gönderebilirsiniz.
+          Açıklama kısmına <strong>“Bağış”</strong> yazmanız yeterlidir.
+        </p>
+
+        <dl>
+          <div>
+            <dt>Banka</dt>
+            <dd>{bank.bankName} · {bank.accountType}</dd>
+          </div>
+          <div>
+            <dt>Alıcı Adı</dt>
+            <dd>{bank.accountName}</dd>
+          </div>
+          <div>
+            <dt>IBAN</dt>
+            <dd>
+              <code id="iban">{bank.iban}</code>
+              <button class="btn btn-sm btn-primary" type="button" id="copy-iban" data-iban={bank.iban}>
+                <Icon name="copy" /> <span>Kopyala</span>
+              </button>
+            </dd>
+          </div>
+        </dl>
+        <p class="sr-only" role="status" aria-live="polite" id="copy-status"></p>
+
+        <p class="receipt">
+          Makbuz için dekontunuzu
+          <a href={`mailto:${contact.email}`}>{contact.email}</a>
+          adresine iletebilirsiniz.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section-invert braille-field other-ways">
+    <div class="shell">
+      <h2>Başka nasıl destek olabilirsiniz?</h2>
+      <div class="grid cols-3 ways">
+        <div class="way">
+          <h3>Üye olun</h3>
+          <p>Derneğimizin çalışmalarına üye olarak katılın, karar süreçlerinde söz sahibi olun.</p>
+          <a class="btn btn-sm btn-primary" href="/uyelik-basvurusu">Üyelik Başvurusu</a>
+        </div>
+        <div class="way">
+          <h3>Gönüllü olun</h3>
+          <p>Eğitim, içerik geliştirme ve organizasyon alanlarında gönüllü ekibimize katılın.</p>
+          <a class="btn btn-sm btn-outline-light" href="/iletisim">Bize Yazın</a>
+        </div>
+        <div class="way">
+          <h3>Kurumsal destek</h3>
+          <p>Kurumunuzla birlikte proje ve sponsorluk iş birlikleri geliştirelim.</p>
+          <a class="btn btn-sm btn-outline-light" href="/iletisim">İletişime Geçin</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .give-grid { display: grid; gap: clamp(2rem, 1rem + 4vw, 4rem); align-items: start; }
+  @media (min-width: 940px) { .give-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); } }
+
+  .give-copy h2 { font-size: var(--step-3); }
+  .give-copy .lede { color: var(--text-muted); font-size: var(--step-1); margin-bottom: 2rem; }
+
+  .uses { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.5rem; }
+  .uses li { display: flex; gap: 1rem; }
+  .ico {
+    display: grid; place-items: center; flex: 0 0 auto;
+    width: 46px; height: 46px; border-radius: 12px;
+    background: var(--amber-100); color: var(--indigo-800);
+    border: 2.5px solid var(--line-strong);
+  }
+  :global(:root[data-theme='dark']) .ico { background: rgba(240,166,60,0.18); color: var(--amber-300); }
+  .ico :global(svg) { width: 21px; height: 21px; }
+  .uses strong { display: block; font-size: var(--step-0); margin-bottom: 0.25rem; }
+  .uses p { margin: 0; color: var(--text-muted); font-size: var(--step--1); line-height: 1.6; }
+
+  .give-card {
+    background: var(--bg-raised);
+    border: 3px solid var(--line-strong);
+    border-radius: var(--radius);
+    box-shadow: 8px 8px 0 0 var(--amber-400);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+  }
+  .give-card h2 { font-size: var(--step-2); margin-bottom: 0.6rem; }
+  .give-note { color: var(--text-muted); font-size: var(--step--1); margin-bottom: 1.75rem; line-height: 1.6; }
+  .give-card dl { margin: 0; display: grid; gap: 1.35rem; }
+  .give-card dt {
+    font-size: 0.74rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--highlight-text); margin-bottom: 0.35rem;
+  }
+  .give-card dd { margin: 0; font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 0.7rem; }
+  code {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 1rem; letter-spacing: 0.03em;
+    background: var(--bg-sunken); border: 2px solid var(--line-strong);
+    border-radius: var(--radius-sm); padding: 0.55rem 0.7rem; word-break: break-all;
+  }
+  #copy-iban :global(svg) { width: 16px; height: 16px; }
+  .receipt {
+    margin: 1.75rem 0 0; padding-top: 1.35rem;
+    border-top: 2px solid var(--line);
+    font-size: 0.88rem; color: var(--text-muted);
+  }
+
+  .other-ways { border-block: 3px solid var(--indigo-950); }
+  .other-ways h2 { color: #fff; margin-bottom: 2rem; }
+  .ways { align-items: start; }
+  .way {
+    padding: 1.5rem;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-radius: var(--radius);
+    background: rgba(255,255,255,0.05);
+  }
+  .way h3 { color: #fff; font-size: var(--step-1); }
+  .way p { color: var(--text-on-invert-muted); font-size: var(--step--1); margin-bottom: 1.25rem; }
+  .btn-outline-light { background: transparent; color: #fff; border-color: #fff; box-shadow: 3px 3px 0 0 rgba(255,255,255,0.4); }
+  .btn-outline-light:hover { background: rgba(255,255,255,0.12); }
+</style>
+
+<script>
+  const btn = document.getElementById('copy-iban') as HTMLButtonElement | null;
+  const status = document.getElementById('copy-status');
+  const label = btn?.querySelector('span');
+
+  btn?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(btn.dataset.iban ?? '');
+    } catch {
+      if (status) status.textContent = 'Kopyalanamadı. IBAN’ı elle seçip kopyalayabilirsiniz.';
+      return;
+    }
+    if (label) label.textContent = 'Kopyalandı';
+    if (status) status.textContent = 'IBAN panoya kopyalandı.';
+    setTimeout(() => { if (label) label.textContent = 'Kopyala'; }, 2500);
+  });
+</script>

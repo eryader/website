@@ -1,0 +1,47 @@
+---
+interface Crumb { label: string; href?: string }
+interface Props {
+  title: string;
+  lede?: string;
+  eyebrow?: string;
+  crumbs?: Crumb[];
+  /** Detay sayfalarında başlığı, gövde metniyle aynı okuma sütununa hizalar. */
+  narrow?: boolean;
+}
+const { title, lede, eyebrow, crumbs = [], narrow = false } = Astro.props;
+const trail: Crumb[] = [{ label: 'Anasayfa', href: '/' }, ...crumbs];
+---
+
+<section class="page-hero">
+  <div class:list={['shell', narrow && 'hero-narrow']}>
+    {trail.length > 1 && (
+      <nav class="crumbs" aria-label="Neredesiniz">
+        <ol>
+          {trail.map((c, i) => (
+            <li>
+              {c.href && i < trail.length - 1
+                ? <a href={c.href}>{c.label}</a>
+                : <span aria-current="page">{c.label}</span>}
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
+    {eyebrow && (
+      <p class="eyebrow">
+        <span class="braille-mark" aria-hidden="true"><i></i><i class="off"></i><i class="off"></i><i></i><i></i><i class="off"></i></span>
+        {eyebrow}
+      </p>
+    )}
+    <h1>{title}</h1>
+    {lede && <p class="lede">{lede}</p>}
+  </div>
+</section>
+
+<style>
+  /* Gövde metninin okuma sütunuyla aynı genişlik ve hiza */
+  .hero-narrow { max-width: 74ch; margin-inline: auto; }
+  .page-hero .eyebrow { color: var(--amber-300); }
+  .page-hero .braille-mark i { background: var(--amber-400); }
+  .page-hero .braille-mark i.off { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.4); }
+</style>

@@ -1,0 +1,19 @@
+{
+  "name": "eryader-org",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kapsayıcı ve Erişilebilir Yaşam Derneği (Eryader) kurumsal web sitesi",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.1.1",
+    "sharp": "^0.33.5"
+  }
+}

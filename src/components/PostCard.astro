@@ -1,0 +1,51 @@
+---
+import { categories } from '../data/site';
+import { formatDate } from '../utils/format';
+
+interface Props {
+  href: string;
+  title: string;
+  cover?: string;
+  date?: Date;
+  summary?: string;
+  category?: keyof typeof categories;
+  /** Görsel yoksa yerine geçecek etiket (galeri sayısı vb.). */
+  badge?: string;
+  delay?: number;
+  /**
+   * Kartın başlık seviyesi. Liste sayfalarında kartlar sayfanın birincil
+   * içeriği olduğu için 2, anasayfa gibi bölümlü sayfalarda 3 kullanılır —
+   * böylece başlık sırası atlamasız kalır.
+   */
+  level?: 2 | 3;
+}
+const { href, title, cover, date, summary, category, badge, delay = 0, level = 3 } = Astro.props;
+const cat = category ? categories[category] : undefined;
+const H = `h${level}` as 'h2' | 'h3';
+---
+
+<article class="card reveal" style={`--d:${delay}ms`}>
+  <div class="card-media">
+    {cover
+      ? <img src={cover} alt="" loading="lazy" decoding="async" width="480" height="300" />
+      : <div class="ph braille-field" aria-hidden="true"></div>}
+    {(cat || badge) && <span class="tag card-tag">{badge ?? cat?.label}</span>}
+  </div>
+  <div class="card-body">
+    <H><a class="stretch" href={href}>{title}</a></H>
+    {summary && <p>{summary}</p>}
+    {date && (
+      <p class="card-foot meta">
+        <time datetime={date.toISOString().slice(0, 10)}>{formatDate(date)}</time>
+      </p>
+    )}
+  </div>
+</article>
+
+<style>
+  .card-tag { position: absolute; top: 0.75rem; left: 0.75rem; background: var(--paper); }
+  .ph { width: 100%; height: 100%; --dot: rgba(59, 44, 125, 0.28); }
+  .card-body :is(h2, h3) a { color: inherit; text-decoration: none; }
+  .card:has(a:hover) .card-body :is(h2, h3) a { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+  .card-body p { display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+</style>

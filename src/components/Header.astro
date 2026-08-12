@@ -1,0 +1,353 @@
+---
+import { nav, site, social } from '../data/site';
+import Icon from './Icon.astro';
+
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
+const groupActive = (item: (typeof nav)[number]) =>
+  isActive(item.href) || ('children' in item && item.children?.some((c) => isActive(c.href)));
+---
+
+<header class="site-header">
+  <!-- Üst şerit: erişilebilirlik araçları + eylem bağlantıları -->
+  <div class="topbar">
+    <div class="shell topbar-inner">
+      <div class="a11y-bar" role="group" aria-label="Görünüm ayarları">
+        <button type="button" data-a11y="fontsize" aria-pressed="false">
+          <Icon name="text-size" />
+          <span>Yazıyı büyüt</span>
+        </button>
+        <button type="button" data-a11y="contrast" aria-pressed="false">
+          <Icon name="contrast" />
+          <span>Yüksek kontrast</span>
+        </button>
+        <button type="button" data-a11y="theme" aria-pressed="false">
+          <Icon name="moon" />
+          <span>Koyu tema</span>
+        </button>
+        <button type="button" data-a11y="motion" aria-pressed="false">
+          <Icon name="motion" />
+          <span>Hareketi azalt</span>
+        </button>
+      </div>
+
+      <div class="topbar-links">
+        <ul class="social" aria-label="Sosyal medya hesaplarımız">
+          {social.map((s) => (
+            <li>
+              <a href={s.url} target="_blank" rel="noopener noreferrer" title={`${site.name} ${s.name}`}>
+                <Icon name={s.name.toLowerCase().replace(/[^a-z]/g, '')} />
+                <span class="sr-only">{s.name} (yeni sekmede açılır)</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a class="btn btn-sm btn-primary" href="/bagis-yap">
+          <Icon name="heart" /> Bağış Yap
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ana gezinme -->
+  <div class="navbar">
+    <div class="shell navbar-inner">
+      <a class="brand" href="/">
+        <img src="/images/eryader-logo.png" width="56" height="56" alt="" />
+        <span class="brand-text">
+          <strong>Eryader</strong>
+          <small>Kapsayıcı ve Erişilebilir Yaşam Derneği</small>
+        </span>
+      </a>
+
+      <button
+        class="nav-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="primary-nav"
+      >
+        <Icon name="menu" />
+        <span>Menü</span>
+      </button>
+
+      <nav id="primary-nav" class="primary-nav" aria-label="Ana menü">
+        <ul class="nav-list">
+          {nav.map((item) => (
+            <li class={'children' in item && item.children ? 'has-sub' : ''}>
+              <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined} class={groupActive(item) ? 'is-active' : ''}>
+                {item.label}
+                {'children' in item && item.children && <Icon name="chevron" />}
+              </a>
+              {'children' in item && item.children && (
+                <ul class="subnav">
+                  {item.children.map((c) => (
+                    <li>
+                      <a href={c.href} aria-current={isActive(c.href) ? 'page' : undefined}>{c.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+          <li class="nav-cta">
+            <a href="/uyelik-basvurusu" class="btn btn-sm btn-invert">Üyelik Başvurusu</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 3px solid var(--line-strong);
+  }
+
+  /* --- Üst şerit --- */
+  .topbar {
+    background: var(--indigo-900);
+    color: #fff;
+    font-size: 0.82rem;
+  }
+  .topbar-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1rem;
+    padding-block: 0.45rem;
+  }
+  .a11y-bar { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .a11y-bar button {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: transparent; color: #ded7ff;
+    border: 1.5px solid transparent; border-radius: 100px;
+    padding: 0.3rem 0.7rem;
+    font: inherit; font-weight: 700; cursor: pointer;
+    transition: background var(--tr), color var(--tr), border-color var(--tr);
+  }
+  .a11y-bar button:hover { background: rgba(255,255,255,0.12); color: #fff; }
+  .a11y-bar button[aria-pressed='true'] {
+    background: var(--amber-400); color: var(--indigo-950); border-color: var(--amber-300);
+  }
+  .a11y-bar :global(svg) { width: 15px; height: 15px; flex: 0 0 auto; }
+
+  .topbar-links { display: flex; align-items: center; gap: 0.85rem; }
+  .social { display: flex; gap: 0.15rem; list-style: none; margin: 0; padding: 0; }
+  .social a {
+    display: grid; place-items: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    color: #ded7ff; text-decoration: none;
+    transition: background var(--tr), color var(--tr);
+  }
+  .social a:hover { background: var(--amber-400); color: var(--indigo-950); }
+  .social :global(svg) { width: 15px; height: 15px; }
+  .topbar-links .btn { box-shadow: 2px 2px 0 0 var(--indigo-950); }
+
+  /* --- Ana gezinme --- */
+  .navbar-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; padding-block: 0.7rem;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; color: var(--text); }
+  .brand img {
+    width: 56px; height: 56px; border-radius: 50%;
+    border: 2.5px solid var(--line-strong);
+    background: #fff;
+    transition: transform var(--tr);
+  }
+  .brand:hover img { transform: rotate(-6deg) scale(1.05); }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+  .brand-text strong {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 22, 'WONK' 1;
+    font-size: 1.5rem; letter-spacing: -0.02em;
+  }
+  .brand-text small { font-size: 0.72rem; color: var(--text-muted); max-width: 24ch; }
+
+  .nav-toggle {
+    display: none;
+    align-items: center; gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    font: inherit; font-weight: 700;
+    background: var(--bg-raised); color: var(--text);
+    border: 2.5px solid var(--line-strong); border-radius: var(--radius-sm);
+    box-shadow: 3px 3px 0 0 var(--shadow-color);
+    cursor: pointer;
+  }
+  .nav-toggle :global(svg) { width: 20px; height: 20px; }
+
+  .nav-list {
+    display: flex; align-items: center; gap: 0.15rem;
+    list-style: none; margin: 0; padding: 0;
+  }
+  .nav-list > li { position: relative; }
+  .nav-list > li > a {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem; font-weight: 700;
+    color: var(--text); text-decoration: none;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: background var(--tr), color var(--tr);
+  }
+  .nav-list > li > a :global(svg) { width: 12px; height: 12px; opacity: 0.65; transition: transform var(--tr); }
+  .nav-list > li > a:hover { background: var(--indigo-100); color: var(--indigo-700); }
+  :global(:root[data-theme='dark']) .nav-list > li > a:hover { background: rgba(255,255,255,0.1); color: var(--amber-300); }
+
+  /* Aktif bölüm: altında turuncu kabartma çizgi */
+  .nav-list > li > a.is-active { color: var(--accent-text); }
+  .nav-list > li > a.is-active::after {
+    content: ''; position: absolute; left: 0.75rem; right: 0.75rem; bottom: 0.28rem;
+    height: 3px; border-radius: 3px; background: var(--amber-400);
+  }
+
+  /* --- Alt menü --- */
+  .subnav {
+    position: absolute; top: calc(100% + 0.35rem); left: 0;
+    min-width: 250px;
+    list-style: none; margin: 0; padding: 0.4rem;
+    background: var(--bg-raised);
+    border: 2.5px solid var(--line-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--raise);
+    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    transition: opacity var(--tr), transform var(--tr), visibility var(--tr);
+  }
+  .has-sub:hover > .subnav,
+  .has-sub:focus-within > .subnav {
+    opacity: 1; visibility: visible; transform: none;
+  }
+  .has-sub:hover > a :global(svg) { transform: rotate(180deg); }
+  .subnav a {
+    display: block; padding: 0.55rem 0.75rem;
+    font-size: 0.88rem; font-weight: 700;
+    color: var(--text); text-decoration: none;
+    border-radius: var(--radius-sm);
+  }
+  .subnav a:hover { background: var(--amber-100); color: var(--amber-600); }
+  :global(:root[data-theme='dark']) .subnav a:hover { background: rgba(240,166,60,0.16); color: var(--amber-300); }
+  .subnav a[aria-current='page'] { background: var(--indigo-100); color: var(--indigo-700); }
+  :global(:root[data-theme='dark']) .subnav a[aria-current='page'] { background: rgba(255,255,255,0.12); color: var(--amber-300); }
+
+  .nav-cta { margin-left: 0.5rem; }
+
+  /* --- Mobil --- */
+  @media (max-width: 1080px) {
+    .brand-text small { display: none; }
+    .nav-toggle { display: inline-flex; }
+    .primary-nav {
+      position: absolute; left: 0; right: 0; top: 100%;
+      background: var(--bg-raised);
+      border-bottom: 3px solid var(--line-strong);
+      border-top: 2px solid var(--line);
+      max-height: min(72vh, 640px);
+      overflow-y: auto;
+      display: none;
+      padding: 0.75rem 0 1.25rem;
+    }
+    .primary-nav.is-open { display: block; }
+    .nav-list { flex-direction: column; align-items: stretch; gap: 0; width: min(100% - 2.5rem, var(--shell)); margin-inline: auto; }
+    .nav-list > li > a { padding: 0.85rem 0.5rem; font-size: 1rem; border-bottom: 1.5px solid var(--line); border-radius: 0; justify-content: space-between; }
+    .nav-list > li > a.is-active::after { display: none; }
+    .nav-list > li > a.is-active { color: var(--accent-text); }
+    .subnav {
+      position: static; opacity: 1; visibility: visible; transform: none;
+      box-shadow: none; border: 0; border-bottom: 1.5px solid var(--line);
+      border-radius: 0; padding: 0.25rem 0 0.6rem 1rem; min-width: 0;
+      background: transparent;
+    }
+    .subnav a { font-weight: 400; }
+    .nav-cta { margin: 1rem 0.5rem 0; }
+    .nav-cta .btn { width: 100%; justify-content: center; }
+  }
+
+  @media (max-width: 620px) {
+    .a11y-bar button span { display: none; }
+    .a11y-bar button { padding: 0.4rem; }
+    .topbar-inner { justify-content: space-between; }
+    .social { display: none; }
+  }
+</style>
+
+<script>
+  // --- Mobil menü ---
+  const toggle = document.querySelector<HTMLButtonElement>('.nav-toggle');
+  const panel = document.querySelector<HTMLElement>('#primary-nav');
+
+  toggle?.addEventListener('click', () => {
+    const open = panel?.classList.toggle('is-open') ?? false;
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+
+  // Esc ile kapat, odağı düğmeye geri ver
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && panel?.classList.contains('is-open')) {
+      panel.classList.remove('is-open');
+      toggle?.setAttribute('aria-expanded', 'false');
+      toggle?.focus();
+    }
+  });
+
+  // --- Erişilebilirlik tercihleri ---
+  type Prefs = { theme?: string; contrast?: string; fontsize?: string; motion?: string };
+  const KEY = 'eryader-a11y';
+  const root = document.documentElement;
+  const read = (): Prefs => {
+    try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; }
+  };
+  const save = (p: Prefs) => {
+    try { localStorage.setItem(KEY, JSON.stringify(p)); } catch {}
+  };
+
+  // Yazı boyutu üç kademe arasında döner
+  const FONT_STEPS = ['', 'l', 'xl'];
+
+  const sync = () => {
+    const p = read();
+    document.querySelectorAll<HTMLButtonElement>('[data-a11y]').forEach((btn) => {
+      const kind = btn.dataset.a11y as keyof Prefs;
+      const on =
+        kind === 'fontsize' ? Boolean(p.fontsize)
+        : kind === 'theme' ? p.theme === 'dark'
+        : kind === 'contrast' ? p.contrast === 'high'
+        : p.motion === 'off';
+      btn.setAttribute('aria-pressed', String(on));
+    });
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('[data-a11y]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const p = read();
+      const kind = btn.dataset.a11y as keyof Prefs;
+
+      if (kind === 'fontsize') {
+        const next = FONT_STEPS[(FONT_STEPS.indexOf(p.fontsize || '') + 1) % FONT_STEPS.length];
+        p.fontsize = next;
+        if (next) root.dataset.fontsize = next; else delete root.dataset.fontsize;
+      } else if (kind === 'theme') {
+        // Sistem tercihini başlangıç noktası al, sonra ikili geçiş yap
+        const current = p.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        p.theme = current === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = p.theme;
+      } else if (kind === 'contrast') {
+        p.contrast = p.contrast === 'high' ? '' : 'high';
+        if (p.contrast) root.dataset.contrast = 'high'; else delete root.dataset.contrast;
+      } else {
+        p.motion = p.motion === 'off' ? '' : 'off';
+        if (p.motion) root.dataset.motion = 'off'; else delete root.dataset.motion;
+      }
+
+      save(p);
+      sync();
+    });
+  });
+
+  sync();
+</script>

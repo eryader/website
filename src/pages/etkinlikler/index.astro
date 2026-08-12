@@ -1,0 +1,89 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import PostCard from '../../components/PostCard.astro';
+import { excerpt } from '../../utils/format';
+
+const events = (await getCollection('etkinlikler')).sort((a, b) => +b.data.date - +a.data.date);
+const now = new Date();
+const upcoming = events.filter((e) => e.data.date >= now);
+const past = events.filter((e) => e.data.date < now);
+---
+
+<Base
+  title="Etkinlikler"
+  description="Kapsayıcı ve Erişilebilir Yaşam Derneği'nin düzenlediği ve katıldığı etkinlikler."
+>
+  <PageHero
+    eyebrow="Etkinlikler"
+    title="Etkinlikler"
+    lede="Derneğimizin düzenlediği ve katkı sunduğu kongre, tanıtım ve eğitim etkinlikleri."
+    crumbs={[{ label: 'Etkinlikler' }]}
+  />
+
+  <section class="section">
+    <div class="shell">
+      {upcoming.length > 0 && (
+        <>
+          <h2 class="group-title">Yaklaşan Etkinlikler</h2>
+          <div class="grid cols-3">
+            {upcoming.map((e, i) => (
+              <PostCard
+                href={`/etkinlikler/${e.id}`}
+                title={e.data.title}
+                cover={e.data.cover}
+                date={e.data.date}
+                summary={excerpt(e.data.summary)}
+                badge="Yaklaşan"
+                delay={i * 60}
+              level={2}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      <h2 class="group-title">Geçmiş Etkinlikler</h2>
+      {past.length ? (
+        <div class="grid cols-3">
+          {past.map((e, i) => (
+            <PostCard
+              href={`/etkinlikler/${e.id}`}
+              title={e.data.title}
+              cover={e.data.cover}
+              date={e.data.date}
+              summary={excerpt(e.data.summary)}
+              badge="Geçmiş"
+              delay={i * 60}
+              level={2}
+            />
+          ))}
+        </div>
+      ) : (
+        <p class="empty">Henüz geçmiş etkinlik kaydı bulunmuyor.</p>
+      )}
+
+      <p class="hint">
+        Çevrimiçi eğitim ve seminer kayıtlarımız için
+        <a href="/webinarlar">Webinarlar</a> sayfasına göz atabilirsiniz.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .group-title {
+    font-family: var(--font-body); font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--highlight-text);
+    margin: 0 0 1.25rem; padding-bottom: 0.6rem;
+    border-bottom: 3px solid var(--line-strong);
+  }
+  .group-title:not(:first-child) { margin-top: 3.5rem; }
+  .hint {
+    margin-top: 2.5rem; padding: 1.1rem 1.3rem;
+    background: var(--bg-sunken); border-left: 5px solid var(--highlight);
+    border-radius: var(--radius-sm); font-size: var(--step--1); color: var(--text-muted);
+  }
+</style>

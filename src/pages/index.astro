@@ -1,0 +1,426 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import PostCard from '../components/PostCard.astro';
+import Icon from '../components/Icon.astro';
+import { site, stats, categories } from '../data/site';
+import { formatDate, excerpt } from '../utils/format';
+
+const posts = (await getCollection('posts')).sort((a, b) => +b.data.date - +a.data.date);
+const featured = posts[0];
+const latest = posts.slice(1, 7);
+
+const galleries = (await getCollection('galeriler')).sort((a, b) => a.data.order - b.data.order).slice(0, 3);
+const videos = (await getCollection('videolar')).sort((a, b) => a.data.order - b.data.order).slice(0, 2);
+
+const focus = [
+  {
+    icon: 'users',
+    title: 'Kapsayıcılık ve Eşitlik',
+    text: 'Görme engelli bireylerin toplumsal yaşama tam katılımını destekliyor; her bireyin eşit haklara sahip olduğunu savunuyoruz.',
+  },
+  {
+    icon: 'doc',
+    title: 'Eğitimde Tam Katılım',
+    text: 'Bireylerin kendileri, aileleri ve akranlarıyla iş birliği içinde eğitimdeki engelleri kaldırıyoruz.',
+  },
+  {
+    icon: 'play',
+    title: 'Teknolojik Uygulamalar',
+    text: 'Akademik becerileri desteklemek için teknolojiye dayalı uygulamalar ve erişilebilir ürünler geliştiriyoruz.',
+  },
+  {
+    icon: 'check',
+    title: 'Evrensel Tasarım',
+    text: 'Sunduğumuz tüm ürün ve hizmetlerin evrensel tasarım ilkesiyle herkes için erişilebilir olmasını sağlıyoruz.',
+  },
+];
+---
+
+<Base title={site.fullName} description={site.shortDesc}>
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="hero-bg braille-field" aria-hidden="true"></div>
+    <div class="shell hero-inner">
+      <div class="hero-copy">
+        <p class="eyebrow reveal" style="--d:0ms">
+          <span class="braille-mark" aria-hidden="true"><i></i><i class="off"></i><i class="off"></i><i></i><i></i><i class="off"></i></span>
+          Ankara · Sivil Toplum Kuruluşu
+        </p>
+        <h1 class="reveal" style="--d:80ms">
+          Görme engelli bireyler için <em>eşit</em> ve <em>erişilebilir</em> bir eğitim.
+        </h1>
+        <p class="hero-lede reveal" style="--d:160ms">
+          Kapsayıcı ve Erişilebilir Yaşam Derneği olarak, engelli bireylerin
+          eğitim ortamlarına tam katılımını destekliyor; akademik ve kişisel
+          gelişimleri için teknolojiye dayalı, evrensel tasarıma uygun çözümler
+          geliştiriyoruz.
+        </p>
+        <div class="stack-actions reveal" style="--d:240ms">
+          <a class="btn btn-primary" href="/uyelik-basvurusu">
+            Üye Ol
+            <Icon name="arrow" class="arrow" />
+          </a>
+          <a class="btn btn-outline" href="/kurumsal/hakkimizda">Bizi Tanıyın</a>
+        </div>
+      </div>
+
+      {featured && (
+        <a class="hero-card reveal" style="--d:320ms" href={`${categories[featured.data.category].base}/${featured.id}`}>
+          <span class="tag">{categories[featured.data.category].label}</span>
+          <h2>{featured.data.title}</h2>
+          <p>{excerpt(featured.data.summary, 150)}</p>
+          <span class="hero-card-foot">
+            <time datetime={featured.data.date.toISOString().slice(0, 10)}>{formatDate(featured.data.date)}</time>
+            <span class="go">Detaylar <Icon name="arrow" class="arrow" /></span>
+          </span>
+        </a>
+      )}
+    </div>
+  </section>
+
+  <!-- ===================== SAYAÇLAR ===================== -->
+  <section class="stats-band">
+    <div class="shell">
+      <dl class="stats">
+        {stats.map((s, i) => (
+          <div class="stat reveal" style={`--d:${i * 90}ms`}>
+            <dt>{s.label}</dt>
+            <dd>{s.value}{'suffix' in s ? s.suffix : ''}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <!-- ===================== ODAK ALANLARI ===================== -->
+  <section class="section">
+    <div class="shell">
+      <SectionHead
+        eyebrow="Ne Yapıyoruz"
+        title="Engelleri birlikte aşıyoruz"
+        lede="Hak temelli yaklaşımla geliştirdiğimiz politikaları dört ana eksende hayata geçiriyoruz."
+        href="/kurumsal/misyonumuz"
+        linkLabel="Misyonumuz"
+      />
+      <div class="grid cols-4 focus-grid">
+        {focus.map((f, i) => (
+          <div class="focus reveal" style={`--d:${i * 90}ms`}>
+            <span class="focus-icon"><Icon name={f.icon} /></span>
+            <h3>{f.title}</h3>
+            <p>{f.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DUYURU & HABER ===================== -->
+  <section class="section band">
+    <div class="shell">
+      <SectionHead
+        eyebrow="Güncel"
+        title="Duyurular ve haberler"
+        href="/duyurular"
+        linkLabel="Tüm Duyurular"
+      />
+      <div class="grid cols-3">
+        {latest.map((p, i) => (
+          <PostCard
+            href={`${categories[p.data.category].base}/${p.id}`}
+            title={p.data.title}
+            cover={p.data.cover}
+            date={p.data.date}
+            summary={excerpt(p.data.summary)}
+            category={p.data.category}
+            delay={i * 70}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MULTİMEDYA ===================== -->
+  <section class="section">
+    <div class="shell">
+      <SectionHead
+        eyebrow="Multimedya"
+        title="Çalışmalarımızdan kareler"
+        href="/foto-galeriler"
+        linkLabel="Tüm Galeriler"
+      />
+      <div class="grid cols-3">
+        {galleries.map((g, i) => (
+          <PostCard
+            href={`/foto-galeriler/${g.id}`}
+            title={g.data.title}
+            cover={g.data.cover}
+            badge={`${g.data.images.length} Görsel`}
+            delay={i * 70}
+          />
+        ))}
+      </div>
+
+      <div class="video-row">
+        {videos.map((v) => (
+          <a class="video-card" href={`/videolar/${v.id}`}>
+            <span class="video-thumb">
+              <img src={v.data.cover} alt="" loading="lazy" decoding="async" width="420" height="236" />
+              <span class="play" aria-hidden="true"><Icon name="play" /></span>
+            </span>
+            <span class="video-meta">
+              <span class="tag">Video</span>
+              <strong>{v.data.title}</strong>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== KATIL ===================== -->
+  <section class="section section-invert cta braille-field">
+    <div class="shell cta-inner">
+      <div>
+        <h2>Dokunduğumuz her hayat, birlikte büyüyor.</h2>
+        <p>
+          Üye olarak, gönüllü çalışarak ya da bağış yaparak görme engelli
+          öğrencilerin erişilebilir eğitim materyallerine ulaşmasına destek
+          olabilirsiniz.
+        </p>
+        <div class="stack-actions">
+          <a class="btn btn-primary" href="/uyelik-basvurusu">Üyelik Başvurusu</a>
+          <a class="btn btn-outline-light" href="/bagis-yap">
+            <Icon name="heart" /> Bağış Yap
+          </a>
+        </div>
+      </div>
+      <ul class="cta-list">
+        <li><Icon name="check" /> Erişilebilir matematik ve fen materyalleri</li>
+        <li><Icon name="check" /> Öğretmen ve aile eğitimleri</li>
+        <li><Icon name="check" /> Dokunsal ve sesli yayınlar</li>
+        <li><Icon name="check" /> Yardımcı teknoloji tanıtımları</li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    background: var(--indigo-900);
+    color: #fff;
+    overflow: hidden;
+    border-bottom: 3px solid var(--indigo-950);
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    --dot: rgba(240, 166, 60, 0.28);
+    mask-image: radial-gradient(120% 90% at 12% 15%, #000 10%, transparent 65%);
+    -webkit-mask-image: radial-gradient(120% 90% at 12% 15%, #000 10%, transparent 65%);
+  }
+  /* Sağ üstte kırpılmış amber daire — logonun halkasına selam */
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -18%; right: -8%;
+    width: min(46vw, 560px); aspect-ratio: 1;
+    border: clamp(14px, 2.2vw, 26px) solid var(--amber-400);
+    border-radius: 50%;
+    opacity: 0.16;
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative;
+    display: grid;
+    gap: clamp(2rem, 1rem + 4vw, 4rem);
+    align-items: center;
+    padding-block: clamp(3.25rem, 2rem + 6vw, 6.5rem);
+  }
+  @media (min-width: 940px) {
+    .hero-inner { grid-template-columns: 1.35fr 1fr; }
+  }
+
+  .hero-copy .eyebrow { color: var(--amber-300); }
+  .hero-copy .braille-mark i { background: var(--amber-400); }
+  .hero-copy .braille-mark i.off { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.45); }
+
+  .hero h1 {
+    font-size: var(--step-5);
+    color: #fff;
+    margin-bottom: 0.4em;
+    max-width: 16ch;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--amber-400);
+    position: relative;
+    white-space: nowrap;
+  }
+  /* Vurgulu kelimelerin altında braille noktaları */
+  .hero h1 em::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: -0.08em;
+    height: 7px;
+    background-image: radial-gradient(circle, var(--amber-400) 2.6px, transparent 2.8px);
+    background-size: 13px 7px;
+    opacity: 0.85;
+  }
+
+  .hero-lede {
+    font-size: var(--step-1);
+    color: #cfc7f0;
+    max-width: 54ch;
+    margin-bottom: 2rem;
+  }
+
+  .btn-outline {
+    background: transparent; color: #fff;
+    border-color: var(--amber-400);
+    box-shadow: 4px 4px 0 0 var(--amber-400);
+  }
+  .btn-outline:hover { background: rgba(255, 255, 255, 0.08); }
+
+  /* Öne çıkan duyuru kartı */
+  .hero-card {
+    display: flex; flex-direction: column; gap: 0.7rem;
+    background: var(--paper);
+    color: var(--ink);
+    border: 3px solid var(--indigo-950);
+    border-radius: var(--radius);
+    box-shadow: 10px 10px 0 0 var(--amber-400);
+    padding: 1.6rem 1.65rem;
+    text-decoration: none;
+    transition: transform var(--tr), box-shadow var(--tr);
+  }
+  .hero-card:hover { transform: translate(-4px, -4px); box-shadow: 14px 14px 0 0 var(--amber-400); }
+  .hero-card h2 {
+    font-size: var(--step-2);
+    margin: 0;
+    color: var(--indigo-800);
+  }
+  .hero-card p { margin: 0; color: #574c78; font-size: var(--step--1); line-height: 1.6; }
+  .hero-card-foot {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 0.6rem; margin-top: 0.4rem; padding-top: 0.9rem;
+    border-top: 2px solid #ded4c2;
+    font-size: var(--step--1); font-weight: 700; color: #574c78;
+  }
+  .hero-card .go { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--indigo-700); }
+  .hero-card .go :global(svg) { width: 17px; height: 17px; transition: transform var(--tr); }
+  .hero-card:hover .go :global(svg) { transform: translateX(4px); }
+  .hero-card .tag { align-self: flex-start; }
+
+  /* ---------- Sayaçlar ---------- */
+  .stats-band {
+    background: var(--amber-400);
+    color: var(--indigo-950);
+    border-bottom: 3px solid var(--indigo-950);
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+    gap: 1rem 2rem;
+    margin: 0;
+    padding-block: clamp(1.75rem, 1rem + 2vw, 2.75rem);
+  }
+  .stat { display: flex; flex-direction: column-reverse; gap: 0.15rem; }
+  .stat + .stat { border-left: 2px solid rgba(23, 16, 76, 0.22); padding-left: clamp(1rem, 2vw, 2rem); }
+  @media (max-width: 560px) {
+    .stat + .stat { border-left: 0; border-top: 2px solid rgba(23, 16, 76, 0.22); padding: 0.85rem 0 0; }
+  }
+  .stat dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 20, 'WONK' 1;
+    font-size: clamp(2.4rem, 1.6rem + 3.4vw, 4rem);
+    font-weight: 800; line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .stat dt { font-size: 0.86rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.82; }
+
+  /* ---------- Odak alanları ---------- */
+  .focus-grid { --gap: clamp(1.25rem, 0.8rem + 1.6vw, 2.25rem); }
+  .focus { position: relative; padding-top: 1.25rem; border-top: 3px solid var(--line-strong); }
+  .focus-icon {
+    display: grid; place-items: center;
+    width: 46px; height: 46px; margin-bottom: 0.9rem;
+    border-radius: 12px;
+    background: var(--amber-100);
+    border: 2.5px solid var(--line-strong);
+    color: var(--indigo-800);
+  }
+  :global(:root[data-theme='dark']) .focus-icon { background: rgba(240,166,60,0.18); color: var(--amber-300); }
+  .focus-icon :global(svg) { width: 22px; height: 22px; }
+  .focus h3 { font-size: var(--step-1); margin-bottom: 0.4em; }
+  .focus p { color: var(--text-muted); font-size: var(--step--1); margin: 0; line-height: 1.65; }
+
+  .band { background: var(--bg-sunken); border-block: 3px solid var(--line-strong); }
+
+  /* ---------- Video şeridi ---------- */
+  .video-row {
+    display: grid; gap: var(--gap);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    margin-top: var(--gap);
+  }
+  .video-card {
+    display: flex; align-items: center; gap: 1.1rem;
+    padding: 0.85rem;
+    background: var(--bg-raised);
+    border: 2.5px solid var(--line-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--raise);
+    text-decoration: none; color: var(--text);
+    transition: transform var(--tr), box-shadow var(--tr);
+  }
+  .video-card:hover { transform: translate(-3px, -3px); box-shadow: var(--raise-lg); }
+  .video-thumb {
+    position: relative; flex: 0 0 42%; max-width: 190px;
+    aspect-ratio: 16 / 10; border-radius: var(--radius-sm); overflow: hidden;
+    border: 2px solid var(--line-strong); background: var(--bg-sunken);
+  }
+  .video-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .play {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    background: rgba(23, 16, 76, 0.42);
+    color: #fff;
+    transition: background var(--tr);
+  }
+  .video-card:hover .play { background: rgba(23, 16, 76, 0.2); }
+  .play :global(svg) {
+    width: 42px; height: 42px; padding: 9px;
+    background: var(--amber-400); color: var(--indigo-950);
+    border-radius: 50%; border: 2.5px solid var(--indigo-950);
+  }
+  .video-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 0.45rem; min-width: 0; }
+  .video-meta strong { font-size: var(--step-0); line-height: 1.35; }
+
+  /* ---------- CTA ---------- */
+  .cta { border-block: 3px solid var(--indigo-950); }
+  .cta-inner {
+    display: grid; gap: clamp(1.75rem, 1rem + 3vw, 3.5rem);
+    align-items: center;
+  }
+  @media (min-width: 860px) { .cta-inner { grid-template-columns: 1.3fr 1fr; } }
+  .cta h2 { color: #fff; max-width: 18ch; }
+  .cta p { color: var(--text-on-invert-muted); font-size: var(--step-1); max-width: 52ch; margin-bottom: 1.75rem; }
+  .btn-outline-light {
+    background: transparent; color: #fff; border-color: #fff;
+    box-shadow: 4px 4px 0 0 rgba(255,255,255,0.45);
+  }
+  .btn-outline-light:hover { background: rgba(255,255,255,0.1); }
+  .cta-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.85rem; }
+  .cta-list li {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    font-size: var(--step-0); font-weight: 700; color: #fff;
+    padding-bottom: 0.85rem; border-bottom: 1.5px solid rgba(255,255,255,0.2);
+  }
+  .cta-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .cta-list :global(svg) {
+    width: 22px; height: 22px; flex: 0 0 auto; padding: 3px;
+    color: var(--indigo-950); background: var(--amber-400); border-radius: 50%;
+  }
+</style>

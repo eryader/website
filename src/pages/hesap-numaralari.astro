@@ -1,0 +1,129 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { bank, contact } from '../data/site';
+---
+
+<Base
+  title="Hesap Numaraları"
+  description="Kapsayıcı ve Erişilebilir Yaşam Derneği bağış ve üye aidatı banka hesap bilgileri."
+>
+  <PageHero
+    eyebrow="İletişim"
+    title="Hesap Numaraları"
+    lede="Bağışlarınız ve üye aidatlarınız için dernek banka hesap bilgilerimiz."
+    crumbs={[{ label: 'İletişim', href: '/iletisim' }, { label: 'Hesap Numaraları' }]}
+  />
+
+  <section class="section">
+    <div class="shell-narrow">
+      <div class="account">
+        <header>
+          <span class="ico"><Icon name="bank" /></span>
+          <div>
+            <h2>{bank.bankName}</h2>
+            <p class="meta">{bank.accountType}</p>
+          </div>
+        </header>
+
+        <dl>
+          <div>
+            <dt>Alıcı Adı</dt>
+            <dd>{bank.accountName}</dd>
+          </div>
+          <div>
+            <dt>IBAN</dt>
+            <dd class="iban-row">
+              <code id="iban">{bank.iban}</code>
+              <button class="btn btn-sm" type="button" id="copy-iban" data-iban={bank.iban}>
+                <Icon name="copy" /> <span>Kopyala</span>
+              </button>
+            </dd>
+          </div>
+        </dl>
+        <p class="live sr-only" role="status" aria-live="polite" id="copy-status"></p>
+      </div>
+
+      <div class="notes prose">
+        <h2>Bağış yaparken</h2>
+        <ul>
+          <li>Havale/EFT açıklamasına <strong>“Bağış”</strong> ya da <strong>“Üye Aidatı”</strong> yazmanız kayıtlarımızın doğru tutulmasına yardımcı olur.</li>
+          <li>Bağışınız için makbuz talep ediyorsanız, dekontunuzu <a href={`mailto:${contact.email}`}>{contact.email}</a> adresine iletebilirsiniz.</li>
+          <li>Kurumsal destek ve sponsorluk için bizimle <a href="/iletisim">iletişime</a> geçebilirsiniz.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .account {
+    background: var(--bg-raised);
+    border: 3px solid var(--line-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--raise-lg);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+  }
+  .account header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.75rem; padding-bottom: 1.35rem; border-bottom: 3px solid var(--line-strong); }
+  .account h2 { font-size: var(--step-2); margin: 0; }
+  .account header p { margin: 0; }
+  .ico {
+    display: grid; place-items: center; flex: 0 0 auto;
+    width: 52px; height: 52px; border-radius: 12px;
+    background: var(--amber-400); color: var(--indigo-950);
+    border: 2.5px solid var(--line-strong);
+  }
+  .ico :global(svg) { width: 24px; height: 24px; }
+
+  dl { margin: 0; display: grid; gap: 1.5rem; }
+  dt {
+    font-size: 0.76rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--highlight-text); margin-bottom: 0.4rem;
+  }
+  dd { margin: 0; font-size: var(--step-0); font-weight: 700; }
+  .iban-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+  code {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: clamp(0.95rem, 0.85rem + 0.5vw, 1.2rem);
+    letter-spacing: 0.04em;
+    background: var(--bg-sunken);
+    border: 2px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.8rem;
+    word-break: break-all;
+  }
+  #copy-iban :global(svg) { width: 16px; height: 16px; }
+
+  .notes { margin-top: 3rem; }
+  .notes h2 { font-size: var(--step-2); }
+</style>
+
+<script>
+  const btn = document.getElementById('copy-iban') as HTMLButtonElement | null;
+  const status = document.getElementById('copy-status');
+  const label = btn?.querySelector('span');
+
+  btn?.addEventListener('click', async () => {
+    const iban = btn.dataset.iban ?? '';
+    try {
+      await navigator.clipboard.writeText(iban);
+    } catch {
+      // Pano izni yoksa metni seçili hale getir, kullanıcı elle kopyalasın
+      const el = document.getElementById('iban');
+      if (el) {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+      }
+      if (status) status.textContent = 'Kopyalanamadı, IBAN seçildi — elle kopyalayabilirsiniz.';
+      return;
+    }
+    if (label) label.textContent = 'Kopyalandı';
+    if (status) status.textContent = 'IBAN panoya kopyalandı.';
+    setTimeout(() => { if (label) label.textContent = 'Kopyala'; }, 2500);
+  });
+</script>

@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PostDetail from '../../components/PostDetail.astro';
+
+export async function getStaticPaths() {
+  const all = await getCollection('posts');
+  return all
+    .filter((p) => p.data.category === 'basinda-biz')
+    .map((entry) => ({
+      params: { slug: entry.id },
+      props: {
+        entry,
+        related: all
+          .filter((p) => p.id !== entry.id)
+          .sort((a, b) => +b.data.date - +a.data.date)
+          .slice(0, 3),
+      },
+    }));
+}
+
+const { entry, related } = Astro.props;
+---
+<Base title={entry.data.title} description={entry.data.summary} image={entry.data.cover}>
+  <PostDetail entry={entry} related={related} />
+</Base>

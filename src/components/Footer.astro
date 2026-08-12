@@ -1,0 +1,161 @@
+---
+import { site, contact, social, footerNav, bank } from '../data/site';
+import Icon from './Icon.astro';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer braille-field">
+  <div class="shell">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/">
+          <img src="/images/eryader-logo.png" width="64" height="64" alt="" />
+          <span>
+            <strong>Eryader</strong>
+            <small>{site.fullName}</small>
+          </span>
+        </a>
+
+        <address>
+          <p>
+            <Icon name="pin" />
+            <span>{contact.address}</span>
+          </p>
+          <p>
+            <Icon name="mail" />
+            <a href={`mailto:${contact.email}`}>{contact.email}</a>
+          </p>
+        </address>
+
+        <ul class="social" aria-label="Sosyal medya hesaplarımız">
+          {social.map((s) => (
+            <li>
+              <a href={s.url} target="_blank" rel="noopener noreferrer">
+                <Icon name={s.name.toLowerCase().replace(/[^a-z]/g, '')} />
+                <span class="sr-only">{s.name} (yeni sekmede açılır)</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {footerNav.map((col) => (
+        <nav class="foot-col" aria-label={col.title}>
+          <h2>{col.title}</h2>
+          <ul>
+            {col.links.map((l) => (
+              <li><a href={l.href}>{l.label}</a></li>
+            ))}
+          </ul>
+        </nav>
+      ))}
+
+      <div class="foot-col foot-support">
+        <h2>Destek Olun</h2>
+        <p class="bank-note">
+          Bağışlarınız görme engelli öğrencilere ulaşan erişilebilir eğitim
+          materyallerine dönüşüyor.
+        </p>
+        <p class="bank">
+          <span>{bank.bankName} · {bank.accountType}</span>
+          <code>{bank.iban}</code>
+        </p>
+        <a class="btn btn-sm btn-primary" href="/bagis-yap">
+          <Icon name="heart" /> Bağış Yap
+        </a>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <p>© {year} {site.fullName}. Tüm hakları saklıdır.</p>
+      <ul>
+        <li><a href="/kurumsal/genel-aydinlatma-metni">KVKK Aydınlatma Metni</a></li>
+        <li><a href="/site-haritasi">Site Haritası</a></li>
+        <li><a href="/erisilebilirlik">Erişilebilirlik</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--indigo-950);
+    color: #e6e1ff;
+    border-top: 3px solid var(--indigo-950);
+    padding-block: clamp(2.75rem, 2rem + 3vw, 4.5rem) 1.75rem;
+    --dot: rgba(240, 166, 60, 0.16);
+    font-size: 0.92rem;
+  }
+
+  .foot-grid {
+    display: grid;
+    gap: clamp(1.75rem, 1rem + 3vw, 3rem);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 215px), 1fr));
+    padding-bottom: 2.5rem;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.16);
+  }
+  .foot-brand { grid-column: span 1; min-width: 0; }
+  @media (min-width: 900px) { .foot-brand { grid-column: span 2; max-width: 42ch; } }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #fff; margin-bottom: 1.25rem; }
+  .brand img { width: 64px; height: 64px; border-radius: 50%; background: #fff; border: 2.5px solid var(--amber-400); }
+  .brand span { display: flex; flex-direction: column; line-height: 1.2; }
+  .brand strong {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 22, 'WONK' 1;
+    font-size: 1.6rem; letter-spacing: -0.02em;
+  }
+  .brand small { font-size: 0.76rem; color: #b6abe6; }
+
+  address { font-style: normal; margin-bottom: 1.25rem; }
+  address p { display: flex; gap: 0.6rem; align-items: flex-start; margin: 0 0 0.6rem; color: #cfc7f0; line-height: 1.55; }
+  address :global(svg) { width: 17px; height: 17px; flex: 0 0 auto; margin-top: 0.2rem; color: var(--amber-400); }
+  address a { color: #fff; }
+
+  .social { display: flex; gap: 0.4rem; list-style: none; margin: 0; padding: 0; }
+  .social a {
+    display: grid; place-items: center;
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.28);
+    color: #e6e1ff; text-decoration: none;
+    transition: background var(--tr), color var(--tr), border-color var(--tr), transform var(--tr);
+  }
+  .social a:hover {
+    background: var(--amber-400); color: var(--indigo-950);
+    border-color: var(--amber-400); transform: translateY(-2px);
+  }
+  .social :global(svg) { width: 17px; height: 17px; }
+
+  .foot-col h2 {
+    font-family: var(--font-body);
+    font-size: 0.76rem; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--amber-400);
+    margin: 0 0 1rem;
+  }
+  .foot-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
+  .foot-col a { color: #d6cff5; text-decoration: none; }
+  .foot-col a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+
+  .foot-support .bank-note { color: #b6abe6; margin-bottom: 0.9rem; line-height: 1.55; }
+  .bank { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 1rem; }
+  .bank span { font-size: 0.76rem; color: #b6abe6; font-weight: 700; letter-spacing: 0.04em; }
+  .bank code {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.82rem; color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 0.6rem;
+    word-break: break-all;
+  }
+
+  .foot-bottom {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 0.6rem 1.5rem; padding-top: 1.5rem;
+    font-size: 0.82rem; color: #a99ee0;
+  }
+  .foot-bottom p { margin: 0; }
+  .foot-bottom ul { display: flex; flex-wrap: wrap; gap: 0.6rem 1.25rem; list-style: none; margin: 0; padding: 0; }
+  .foot-bottom a { color: #cfc7f0; }
+</style>
